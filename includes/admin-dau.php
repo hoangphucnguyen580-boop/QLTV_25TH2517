@@ -31,6 +31,9 @@ $loaiHopLe = ['success', 'danger', 'warning', 'info'];
                 <li class="nav-item">
                     <a class="nav-link<?= $menuHienTai === 'sach' ? ' active' : '' ?>" href="sach.php">Sách</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link<?= $menuHienTai === 'docgia' ? ' active' : '' ?>" href="docgia.php">Độc giả</a>
+                </li>
             </ul>
             <div class="dropdown">
                 <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button"
