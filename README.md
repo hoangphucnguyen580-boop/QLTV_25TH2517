@@ -10,7 +10,9 @@ QLTV_25TH2517/
 │   ├── index.php           # trang chủ: số liệu tổng quan
 │   ├── sach.php            # danh sách sách: tìm kiếm, lọc thể loại, phân trang
 │   ├── sach-form.php       # thêm / sửa sách
-│   └── sach-xoa.php        # xóa sách (chỉ nhận POST)
+│   ├── sach-xoa.php        # xóa sách (chỉ nhận POST)
+│   ├── theloai.php
+│   └── nhaxuatban.php
 ├── includes/               # file dùng chung, không mở trực tiếp bằng trình duyệt
 │   ├── helpers.php         # escape, session an toàn, CSRF, thông báo
 │   ├── csdl.php            # hàm chạy prepared statement
