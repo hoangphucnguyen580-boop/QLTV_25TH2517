@@ -67,7 +67,7 @@ INSERT INTO sach (ma_sach, ten_sach, tac_gia, id_theloai, id_nxb, nam_xuat_ban, 
   ('SH0010', 'Nguyên lý kinh tế học',            'N. Gregory Mankiw',             4, 1, 2019, 700, 250000, 2, 2, 'Giáo trình kinh tế.'),                          -- 10
   ('SH0011', 'Lược sử thời gian',                'Stephen Hawking',               3, 2, 2018, 280, 120000, 3, 3, 'Khoa học phổ thông.'),                          -- 11
   ('SH0012', 'Sapiens: Lược sử loài người',      'Yuval Noah Harari',             6, 6, 2021, 560, 220000, 4, 4, 'Lịch sử loài người.'),                          -- 12
-  ('SH0013', 'Việt Nam sử lược',                 'Trần Trọng Kim',                6, 6, 2017, 600,  90000, 2, 2, 'Sử học.'),                                      -- 13
+  ('SH0013', 'Việt Nam sử lược',                 'Trần Trọng Kim',                6, 6, 2017, 600,  90000, 1, 1, 'Sử học.'),                                      -- 13 (có 1 bản đã mất trong PM0010 nên tổng chỉ còn 1)
   ('SH0014', 'Giáo trình Cơ sở dữ liệu',         'Nhiều tác giả',                 1, 1, 2022, 350,  95000, 6, 6, 'Giáo trình CSDL.'),                             -- 14
   ('SH0015', 'Giáo trình Công nghệ phần mềm',    'Nhiều tác giả',                 1, 1, 2022, 400, 110000, 6, 6, 'Giáo trình CNPM.'),                             -- 15
   ('SH0016', 'Lập trình C++ căn bản',            'Nhiều tác giả',                 1, 4, 2021, 420, 105000, 5, 5, 'Giáo trình C++.'),                              -- 16

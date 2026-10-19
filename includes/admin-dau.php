@@ -29,6 +29,9 @@ $loaiHopLe = ['success', 'danger', 'warning', 'info'];
                     <a class="nav-link<?= $menuHienTai === 'trangchu' ? ' active' : '' ?>" href="index.php">Trang chủ</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link<?= $menuHienTai === 'phieumuon' ? ' active' : '' ?>" href="phieumuon.php">Phiếu mượn</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link<?= $menuHienTai === 'sach' ? ' active' : '' ?>" href="sach.php">Sách</a>
                 </li>
                 <li class="nav-item">
