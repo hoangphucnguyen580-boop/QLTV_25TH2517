@@ -1,0 +1,12 @@
+# Thư mục chứa ảnh người dùng upload: tuyệt đối không cho chạy mã.
+# Cách làm: cấm truy cập MỌI file, rồi chỉ mở lại cho 3 loại ảnh được phép.
+# (Tên file ảnh do server tự sinh dạng <32 ký tự hex>.<jpg|png|webp> nên không thể có đuôi kép như x.php.jpg.)
+<FilesMatch ".*">
+    Require all denied
+</FilesMatch>
+<FilesMatch "^[a-f0-9]{32}\.(jpg|png|webp)$">
+    Require all granted
+</FilesMatch>
+
+# Không cho liệt kê nội dung thư mục
+Options -Indexes

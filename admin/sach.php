@@ -1,6 +1,7 @@
 <?php
 // Danh sách sách: tìm kiếm theo mã/tên/tác giả, lọc theo thể loại, phân trang.
 require_once __DIR__ . '/../includes/khoi-tao-admin.php';
+require_once __DIR__ . '/../includes/anh-bia.php';
 
 $soDongMoiTrang = 10;
 
@@ -42,7 +43,7 @@ $pageNum = min($pageNum, $maxPage);                    // không vượt quá tr
 $offset  = ($pageNum - 1) * $soDongMoiTrang;           // vị trí dòng đầu của trang
 
 // ---- 4. Lấy đúng các dòng của trang hiện tại ----
-$sql = "SELECT s.id, s.ma_sach, s.ten_sach, s.tac_gia, s.gia_tien, s.so_luong, s.so_con_lai,
+$sql = "SELECT s.id, s.ma_sach, s.ten_sach, s.tac_gia, s.gia_tien, s.so_luong, s.so_con_lai, s.hinh_bia,
                tl.ten_theloai, nxb.ten_nxb
         FROM sach s
         JOIN theloai tl    ON tl.id = s.id_theloai
@@ -113,6 +114,7 @@ require __DIR__ . '/../includes/admin-dau.php';
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light">
                 <tr>
+                    <th>Bìa</th>
                     <th>Mã</th>
                     <th>Tên sách</th>
                     <th>Tác giả</th>
@@ -124,7 +126,17 @@ require __DIR__ . '/../includes/admin-dau.php';
             </thead>
             <tbody>
             <?php foreach ($dsSach as $sach): ?>
+                <?php $urlAnh = urlAnhBia($sach['hinh_bia']); ?>
                 <tr>
+                    <td>
+                        <?php if ($urlAnh !== null): ?>
+                            <img src="<?= e($urlAnh) ?>" alt="Bìa <?= e($sach['ten_sach']) ?>" class="rounded border"
+                                 style="width:40px;height:56px;object-fit:cover">
+                        <?php else: ?>
+                            <div class="rounded border bg-secondary-subtle text-secondary d-flex align-items-center justify-content-center text-center"
+                                 style="width:40px;height:56px;font-size:.6rem;line-height:1.1">Chưa có ảnh</div>
+                        <?php endif; ?>
+                    </td>
                     <td><?= e($sach['ma_sach']) ?></td>
                     <td><?= e($sach['ten_sach']) ?></td>
                     <td><?= e($sach['tac_gia']) ?></td>
@@ -149,7 +161,7 @@ require __DIR__ . '/../includes/admin-dau.php';
                 </tr>
             <?php endforeach; ?>
             <?php if ($numRows === 0): ?>
-                <tr><td colspan="7" class="text-center text-muted py-4">Không có sách nào khớp.</td></tr>
+                <tr><td colspan="8" class="text-center text-muted py-4">Không có sách nào khớp.</td></tr>
             <?php endif; ?>
             </tbody>
         </table>

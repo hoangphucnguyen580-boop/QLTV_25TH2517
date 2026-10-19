@@ -1,12 +1,13 @@
 <?php
 // Form thêm sách mới (không có ?id=) và sửa sách (có ?id=...). Cả hai dùng chung một trang.
 require_once __DIR__ . '/../includes/khoi-tao-admin.php';
+require_once __DIR__ . '/../includes/anh-bia.php';
 
 // ---- 1. Xác định đang thêm hay sửa ----
-$dangSua    = isset($_GET['id']);
-$idSach     = 0;
+$dangSua     = isset($_GET['id']);
+$idSach      = 0;
 $sachHienTai = null;
-$dangMuon   = 0;   // số bản của sách này đang nằm ngoài kệ (chưa trả)
+$dangMuon    = 0;   // số bản của sách này đang nằm ngoài kệ (chưa trả)
 
 if ($dangSua) {
     $idSach = filter_var(layChuoiGet('id'), FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
@@ -51,6 +52,14 @@ if ($dangSua) {
 $loi = [];   // lỗi theo từng ô: $loi['ten_sach'] = '...'
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Gửi file lớn hơn post_max_size của PHP thì cả $_POST lẫn $_FILES đều rỗng, mã CSRF cũng mất theo.
+    // Bắt trường hợp này trước để báo đúng nguyên nhân thay vì báo "thiếu mã CSRF".
+    if (count($_POST) === 0 && count($_FILES) === 0 && (int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > 0) {
+        datThongBao('danger', 'Dữ liệu gửi lên vượt giới hạn của máy chủ. Hãy chọn ảnh bìa nhỏ hơn 2 MB rồi thử lại.');
+        header('Location: sach.php');
+        exit;
+    }
+
     batBuocCsrf();
 
     // Giữ lại những gì người dùng vừa nhập để hiện lại nếu có lỗi (sticky form)
@@ -124,36 +133,76 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $loi['mo_ta'] = 'Mô tả tối đa 2000 ký tự.';
     }
 
+    // Ảnh bìa: không bắt buộc. Chọn file mới thì kiểm tra; tick "Xóa ảnh hiện tại" thì bỏ ảnh (chỉ khi đang sửa).
+    $tepAnh   = $_FILES['hinh_bia'] ?? null;
+    $coAnhMoi = is_array($tepAnh)
+        && (!isset($tepAnh['error']) || is_array($tepAnh['error']) || (int) $tepAnh['error'] !== UPLOAD_ERR_NO_FILE);
+    $duoiAnh  = null;
+    if ($coAnhMoi) {
+        [$loiAnh, $duoiAnh] = kiemTraAnhBia($tepAnh);
+        if ($loiAnh !== null) {
+            $loi['hinh_bia'] = $loiAnh;
+        }
+    }
+    $xoaAnh = $dangSua && (layChuoiPost('xoa_anh') === '1');
+
+    // Lưu file ảnh vào uploads/ chỉ khi mọi ô khác đã hợp lệ (có lỗi thì không để lại file thừa)
+    $hinhBiaCu  = $dangSua ? ($sachHienTai['hinh_bia'] ?? null) : null;
+    $hinhBiaMoi = null;   // đường dẫn ảnh vừa lưu vào uploads/ trong lần bấm Lưu này
+    if (count($loi) === 0 && $coAnhMoi) {
+        $hinhBiaMoi = luuAnhBia($tepAnh['tmp_name'], $duoiAnh);
+        if ($hinhBiaMoi === null) {
+            $loi['hinh_bia'] = 'Không lưu được ảnh vào thư mục uploads. Hãy kiểm tra thư mục có tồn tại và có quyền ghi không.';
+        }
+    }
+
     // ---- Không có lỗi nào thì ghi vào CSDL ----
     if (count($loi) === 0) {
         $moTa     = ($giaTri['mo_ta'] === '') ? null : $giaTri['mo_ta'];
         $soConLai = $soLuong - $dangMuon;   // thêm mới thì $dangMuon = 0 nên còn lại = tổng
 
+        // Quyết định giá trị cột hinh_bia: ảnh mới > xóa ảnh > giữ ảnh cũ
+        if ($hinhBiaMoi !== null) {
+            $hinhBia = $hinhBiaMoi;
+        } elseif ($xoaAnh) {
+            $hinhBia = null;
+        } else {
+            $hinhBia = $hinhBiaCu;
+        }
+
         try {
             if ($dangSua) {
                 $sql = 'UPDATE sach SET ma_sach = ?, ten_sach = ?, tac_gia = ?, id_theloai = ?, id_nxb = ?,
-                               nam_xuat_ban = ?, so_trang = ?, gia_tien = ?, so_luong = ?, so_con_lai = ?, mo_ta = ?
+                               nam_xuat_ban = ?, so_trang = ?, gia_tien = ?, so_luong = ?, so_con_lai = ?, mo_ta = ?,
+                               hinh_bia = ?
                         WHERE id = ?';
-                $stmt = truyVan($conn, $sql, 'sssiiiiiiisi', [
+                $stmt = truyVan($conn, $sql, 'sssiiiiiiissi', [
                     $giaTri['ma_sach'], $giaTri['ten_sach'], $giaTri['tac_gia'], $idTheLoai, $idNxb,
-                    $namXuatBan, $soTrang, $giaTien, $soLuong, $soConLai, $moTa, $idSach,
+                    $namXuatBan, $soTrang, $giaTien, $soLuong, $soConLai, $moTa, $hinhBia, $idSach,
                 ]);
                 mysqli_stmt_close($stmt);
                 datThongBao('success', 'Đã cập nhật sách "' . $giaTri['ten_sach'] . '".');
             } else {
                 $sql = 'INSERT INTO sach (ma_sach, ten_sach, tac_gia, id_theloai, id_nxb,
-                               nam_xuat_ban, so_trang, gia_tien, so_luong, so_con_lai, mo_ta)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-                $stmt = truyVan($conn, $sql, 'sssiiiiiiis', [
+                               nam_xuat_ban, so_trang, gia_tien, so_luong, so_con_lai, mo_ta, hinh_bia)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+                $stmt = truyVan($conn, $sql, 'sssiiiiiiiss', [
                     $giaTri['ma_sach'], $giaTri['ten_sach'], $giaTri['tac_gia'], $idTheLoai, $idNxb,
-                    $namXuatBan, $soTrang, $giaTien, $soLuong, $soConLai, $moTa,
+                    $namXuatBan, $soTrang, $giaTien, $soLuong, $soConLai, $moTa, $hinhBia,
                 ]);
                 mysqli_stmt_close($stmt);
                 datThongBao('success', 'Đã thêm sách "' . $giaTri['ten_sach'] . '".');
             }
+
+            // Ghi CSDL xong mới xóa file ảnh cũ (nếu ảnh đã bị thay hoặc bị bỏ)
+            if ($dangSua && $hinhBia !== $hinhBiaCu) {
+                xoaAnhBia($hinhBiaCu);
+            }
             header('Location: sach.php');
             exit;
         } catch (mysqli_sql_exception $ngoaiLe) {
+            // Ghi CSDL lỗi thì bỏ file ảnh vừa lưu, tránh để lại file mồ côi trong uploads/
+            xoaAnhBia($hinhBiaMoi);
             if ($ngoaiLe->getCode() === 1062) {
                 // 1062 = trùng giá trị ở cột UNIQUE (ở đây chỉ có thể là ma_sach)
                 $loi['ma_sach'] = 'Mã sách này đã tồn tại.';
@@ -163,6 +212,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
+// Ảnh bìa đang lưu (chỉ có khi sửa): hiện ảnh nếu file còn, không thì hiện khối xám
+$hinhBiaDangLuu = $dangSua ? ($sachHienTai['hinh_bia'] ?? null) : null;
+$urlAnhHienTai  = urlAnhBia($hinhBiaDangLuu);
 
 $tieuDe      = $dangSua ? 'Sửa sách' : 'Thêm sách';
 $menuHienTai = 'sach';
@@ -183,8 +236,8 @@ require __DIR__ . '/../includes/admin-dau.php';
             <div class="alert alert-danger">Chưa lưu được. Hãy sửa các ô đang viền đỏ rồi bấm Lưu lại.</div>
         <?php endif; ?>
 
-        <!-- Không đặt action: form gửi về chính URL hiện tại (giữ nguyên ?id=...) -->
-        <form method="post" novalidate>
+        <!-- Không đặt action: form gửi về chính URL hiện tại (giữ nguyên ?id=...). enctype bắt buộc để gửi được file. -->
+        <form method="post" enctype="multipart/form-data" novalidate>
             <input type="hidden" name="csrf" value="<?= e(taoTokenCsrf()) ?>">
 
             <div class="row g-3">
@@ -258,6 +311,34 @@ require __DIR__ . '/../includes/admin-dau.php';
                     <?php if ($dangSua): ?>
                         <div class="form-text">Đang có <?= $dangMuon ?> bản được mượn.</div>
                     <?php endif; ?>
+                </div>
+
+                <div class="col-12">
+                    <label for="hinh_bia" class="form-label">Ảnh bìa</label>
+                    <div class="d-flex gap-3 align-items-start">
+                        <?php if ($urlAnhHienTai !== null): ?>
+                            <img src="<?= e($urlAnhHienTai) ?>" alt="Bìa sách hiện tại" class="rounded border"
+                                 style="width:96px;height:134px;object-fit:cover">
+                        <?php else: ?>
+                            <div class="rounded border bg-secondary-subtle text-secondary d-flex align-items-center justify-content-center text-center small"
+                                 style="width:96px;height:134px">Chưa có ảnh</div>
+                        <?php endif; ?>
+                        <div class="flex-grow-1">
+                            <input type="file" class="form-control<?= lopLoi($loi, 'hinh_bia') ?>" id="hinh_bia" name="hinh_bia"
+                                   accept="image/jpeg,image/png,image/webp">
+                            <?php hienLoi($loi, 'hinh_bia'); ?>
+                            <div class="form-text">
+                                JPG, PNG hoặc WebP, tối đa 2 MB. Nếu form báo lỗi ở ô khác thì phải chọn lại ảnh
+                                (trình duyệt không giữ lại file đã chọn).
+                            </div>
+                            <?php if ($hinhBiaDangLuu !== null && $hinhBiaDangLuu !== ''): ?>
+                                <div class="form-check mt-2">
+                                    <input class="form-check-input" type="checkbox" name="xoa_anh" value="1" id="xoa_anh">
+                                    <label class="form-check-label" for="xoa_anh">Xóa ảnh hiện tại</label>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="col-12">

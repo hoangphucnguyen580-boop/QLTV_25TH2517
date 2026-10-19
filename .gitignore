@@ -1,6 +1,7 @@
 # Cấu hình có thể chứa mật khẩu thật: không đưa lên Git
 config.php
 
-# Ảnh người dùng upload: giữ thư mục, bỏ nội dung
+# Ảnh người dùng upload: giữ thư mục và file .htaccess bảo vệ, bỏ nội dung còn lại
 uploads/*
 !uploads/.gitkeep
+!uploads/.htaccess
