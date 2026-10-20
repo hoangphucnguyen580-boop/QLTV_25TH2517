@@ -51,5 +51,10 @@ require __DIR__ . '/../includes/admin-dau.php';
     </div>
 </div>
 
-<a href="sach.php" class="btn btn-primary">Quản lý sách</a>
+<div class="d-flex flex-wrap gap-2">
+    <a href="phieumuon-them.php" class="btn btn-primary">+ Lập phiếu mượn</a>
+    <a href="phieumuon.php?trangthai=qua_han" class="btn btn-outline-danger">Xem phiếu quá hạn</a>
+    <a href="thongke.php" class="btn btn-outline-primary">Thống kê</a>
+    <a href="sach.php" class="btn btn-outline-secondary">Quản lý sách</a>
+</div>
 <?php require __DIR__ . '/../includes/admin-cuoi.php'; ?>
