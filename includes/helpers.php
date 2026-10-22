@@ -1,6 +1,9 @@
 <?php
 // Hàm dùng chung cho toàn dự án: escape đầu ra, đọc dữ liệu form, session an toàn, token CSRF, thông báo một lần.
 
+// Thời gian không thao tác tối đa (giây). Quá mức này thì phiên đăng nhập (thủ thư lẫn độc giả) bị hủy.
+const PHIEN_HET_HAN_SAU = 1800;   // 30 phút
+
 // ---------------------------------------------------------------------
 // Escape + đọc dữ liệu người dùng
 // ---------------------------------------------------------------------
@@ -37,6 +40,27 @@ function doDaiChuoi(string $chuoi): int
 }
 
 // ---------------------------------------------------------------------
+// Header bảo mật
+// ---------------------------------------------------------------------
+
+// Gửi các header giúp trình duyệt tự bảo vệ người dùng. Phải gọi trước khi in bất kỳ nội dung nào.
+function guiHeaderBaoMat(): void
+{
+    if (headers_sent()) {
+        return;
+    }
+    // Không cho trang khác nhúng trang của mình vào iframe: chặn kiểu "clickjacking"
+    // (lừa thủ thư bấm nút Xóa / Trả sách nằm ẩn dưới một trang giả).
+    // Hai header cùng ý nghĩa: X-Frame-Options cho trình duyệt cũ, frame-ancestors cho trình duyệt mới.
+    header('X-Frame-Options: SAMEORIGIN');
+    header("Content-Security-Policy: frame-ancestors 'self'");
+    // Trình duyệt không được tự đoán lại loại nội dung (file ảnh không bao giờ bị coi là script)
+    header('X-Content-Type-Options: nosniff');
+    // Khi bấm link sang trang khác, không gửi địa chỉ trang hiện tại đi theo
+    header('Referrer-Policy: same-origin');
+}
+
+// ---------------------------------------------------------------------
 // Session
 // ---------------------------------------------------------------------
 
@@ -46,8 +70,13 @@ function khoiDongSession(): void
     if (session_status() === PHP_SESSION_ACTIVE) {
         return;
     }
+    guiHeaderBaoMat();
+
     // Đặt tên riêng để không đè lên session của dự án khác cùng chạy ở localhost:8000
     session_name('QLTV_PHIEN');
+    // Chỉ nhận mã phiên do chính máy chủ cấp. Nếu trình duyệt gửi lên một mã lạ (do kẻ khác đặt sẵn),
+    // PHP bỏ mã đó và cấp mã mới, nên không thể "gieo" sẵn một phiên rồi đợi nạn nhân đăng nhập vào.
+    ini_set('session.use_strict_mode', '1');
     session_set_cookie_params([
         'lifetime' => 0,                            // mất khi đóng trình duyệt
         'path'     => '/',
@@ -56,6 +85,23 @@ function khoiDongSession(): void
         'samesite' => 'Lax',
     ]);
     session_start();
+
+    kiemTraHetHanPhien();
+}
+
+// Hủy đăng nhập nếu đã quá PHIEN_HET_HAN_SAU giây kể từ lần thao tác cuối.
+// Mỗi lần mở một trang thì đồng hồ được tính lại từ đầu.
+function kiemTraHetHanPhien(): void
+{
+    $bayGio  = time();
+    $lanCuoi = $_SESSION['hoat_dong_cuoi'] ?? null;
+
+    if (is_int($lanCuoi) && ($bayGio - $lanCuoi) > PHIEN_HET_HAN_SAU) {
+        // Chỉ bỏ phần đăng nhập của hai khu. Các khóa khác (token CSRF, bộ đếm sai mật khẩu) giữ nguyên.
+        unset($_SESSION['nhan_vien'], $_SESSION['doc_gia']);
+        session_regenerate_id(true);
+    }
+    $_SESSION['hoat_dong_cuoi'] = $bayGio;
 }
 
 // ---------------------------------------------------------------------

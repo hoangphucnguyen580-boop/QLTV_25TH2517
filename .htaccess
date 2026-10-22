@@ -1,0 +1,5 @@
+Options -Indexes
+<FilesMatch "^(config\.php|config\.mau\.php)$|\.(sql|md|log|bak|ini)$|^\.git">
+    Require all denied
+</FilesMatch>
+RedirectMatch 404 /\.git

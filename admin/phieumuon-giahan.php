@@ -17,7 +17,17 @@ if ($idPhieu === false) {
     exit;
 }
 
-$ketQua = giaHanPhieu($conn, $idPhieu);
+// Số lần đã gia hạn mà trang chi tiết đang hiển thị lúc thủ thư bấm nút (ô ẩn lan_da_dung trong form).
+// Nếu số này không còn khớp với CSDL thì hàm giaHanPhieu() từ chối: bấm đúp hay mở hai tab
+// cũng không thể gia hạn phiếu hai lần chỉ với một lần bấm.
+$lanDaDung = filter_var(layChuoiPost('lan_da_dung'), FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]);
+if ($lanDaDung === false) {
+    datThongBao('danger', 'Yêu cầu không hợp lệ. Hãy mở lại phiếu rồi bấm Gia hạn.');
+    header('Location: phieumuon-chitiet.php?id=' . $idPhieu);
+    exit;
+}
+
+$ketQua = giaHanPhieu($conn, $idPhieu, $lanDaDung);
 if ($ketQua['thanh_cong']) {
     datThongBao('success', 'Đã gia hạn phiếu ' . $ketQua['ma_phieu'] . ' đến ' . ngayVN($ketQua['ngay_hen_tra'])
         . ' (lần ' . $ketQua['lan_da_dung'] . '/' . $ketQua['lan_toi_da'] . ').');

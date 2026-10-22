@@ -19,14 +19,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tenDangNhap = layChuoiPost('ten_dang_nhap');
     $matKhau     = isset($_POST['mat_khau']) && is_string($_POST['mat_khau']) ? $_POST['mat_khau'] : '';   // không trim mật khẩu
 
-    if (dangNhapNhanVien($conn, $tenDangNhap, $matKhau)) {
+    $ketQua = dangNhapNhanVien($conn, $tenDangNhap, $matKhau);
+    if ($ketQua['thanh_cong']) {
         header('Location: index.php');
         exit;
     }
-    $loi = 'Sai tên đăng nhập hoặc mật khẩu.';   // thông báo chung, không lộ tài khoản nào tồn tại
+    $loi = $ketQua['loi'];   // thông báo chung, không lộ tài khoản nào tồn tại
 }
 
-$daThoat = (layChuoiGet('da_thoat') === '1');   // vừa đăng xuất xong thì hiện lời nhắn
+// Lời nhắn "đã đăng xuất" chỉ hiện khi MỞ trang (GET). Gửi form đăng nhập sai (POST về cùng địa chỉ
+// còn ?da_thoat=1) thì không hiện, tránh dòng xanh "đã đăng xuất" nằm chung với dòng đỏ báo lỗi.
+$moTrang = ($_SERVER['REQUEST_METHOD'] !== 'POST');
+$daThoat = $moTrang && (layChuoiGet('da_thoat') === '1');
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -66,6 +70,9 @@ $daThoat = (layChuoiGet('da_thoat') === '1');   // vừa đăng xuất xong thì
                         </div>
                         <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
                     </form>
+                    <p class="text-center small text-muted mt-3 mb-0">
+                        <a href="../index.php">&larr; Về trang chọn</a>
+                    </p>
                 </div>
             </div>
         </div>

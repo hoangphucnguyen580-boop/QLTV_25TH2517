@@ -499,15 +499,20 @@ function taoThongBaoTra(array $dsKetQua): string
 // ---------------------------------------------------------------------
 // Gia hạn cả phiếu: ngày hẹn trả cộng thêm đúng số ngày mượn của loại độc giả (sinh viên +7, giảng viên +15).
 // Chỉ gia hạn khi: phiếu còn sách chưa trả, độc giả không bị khóa, phiếu CHƯA quá hạn, còn lượt gia hạn.
+//
+//   $lanDaDungMongDoi : số lần đã gia hạn mà trang đang hiển thị cho thủ thư lúc bấm nút (null = không kiểm).
+//                       Nếu số này khác số thật trong CSDL (do bấm đúp, hoặc mở hai tab) thì từ chối,
+//                       tránh trường hợp một lần bấm nút mà phiếu bị gia hạn hai lần.
+//
 // Trả về: thanh_cong, loi, ma_phieu, ngay_hen_tra (mới), lan_da_dung, lan_toi_da
-function giaHanPhieu(mysqli $conn, int $idPhieu): array
+function giaHanPhieu(mysqli $conn, int $idPhieu, ?int $lanDaDungMongDoi = null): array
 {
-    return chayGiaoDichCoThuLai(function () use ($conn, $idPhieu) {
-        return thucHienGiaHanPhieu($conn, $idPhieu);
+    return chayGiaoDichCoThuLai(function () use ($conn, $idPhieu, $lanDaDungMongDoi) {
+        return thucHienGiaHanPhieu($conn, $idPhieu, $lanDaDungMongDoi);
     });
 }
 
-function thucHienGiaHanPhieu(mysqli $conn, int $idPhieu): array
+function thucHienGiaHanPhieu(mysqli $conn, int $idPhieu, ?int $lanDaDungMongDoi): array
 {
     $kq = ['thanh_cong' => false, 'loi' => '', 'ma_phieu' => '', 'ngay_hen_tra' => '', 'lan_da_dung' => 0, 'lan_toi_da' => 0];
 
@@ -544,7 +549,11 @@ function thucHienGiaHanPhieu(mysqli $conn, int $idPhieu): array
         $lanToiDa  = (int) $thongTin['so_lan_gia_han'];
         $kq['lan_toi_da'] = $lanToiDa;
 
-        if ((int) $thongTin['chua_tra'] === 0) {
+        if ($lanDaDungMongDoi !== null && $lanDaDungMongDoi !== $lanDaDung) {
+            // Kiểm trong lúc đang giữ khóa dòng phiếu nên hai yêu cầu cùng lúc không thể cùng lọt qua đây
+            $kq['loi'] = 'Phiếu ' . $phieu['ma_phieu'] . ' vừa được gia hạn rồi (hiện ' . $lanDaDung . '/' . $lanToiDa
+                . ' lần), trang bạn đang xem đã cũ. Hãy kiểm tra lại ngày hẹn trả mới.';
+        } elseif ((int) $thongTin['chua_tra'] === 0) {
             $kq['loi'] = 'Phiếu ' . $phieu['ma_phieu'] . ' đã trả hết sách, không thể gia hạn.';
         } elseif ($thongTin['trang_thai'] !== 'hoat_dong') {
             $kq['loi'] = 'Độc giả "' . $thongTin['ho_ten'] . '" đang bị khóa, không được gia hạn.';

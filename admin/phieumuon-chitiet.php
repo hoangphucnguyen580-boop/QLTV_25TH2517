@@ -90,9 +90,13 @@ require __DIR__ . '/../includes/admin-dau.php';
                 <span class="badge text-bg-<?= $mauTrangThai ?> ms-2"><?= e($nhanTrangThai) ?></span>
             </h1>
             <div class="d-flex flex-wrap gap-2">
+                <!-- Lập xong một phiếu thì bấm đây để nhập luôn phiếu cho người kế tiếp -->
+                <a href="phieumuon-them.php" class="btn btn-primary">+ Lập phiếu mới</a>
                 <form method="post" action="phieumuon-giahan.php">
                     <input type="hidden" name="csrf" value="<?= e(taoTokenCsrf()) ?>">
                     <input type="hidden" name="id" value="<?= (int) $phieu['id'] ?>">
+                    <!-- Số lần đã gia hạn đang hiển thị: máy chủ so lại với CSDL để chặn gia hạn trùng do bấm đúp -->
+                    <input type="hidden" name="lan_da_dung" value="<?= (int) $phieu['so_lan_gia_han_da_dung'] ?>">
                     <?php if ($lyDoKhongGiaHan === ''): ?>
                         <button type="submit" class="btn btn-outline-primary"
                                 onclick="return confirm('Gia hạn thêm <?= (int) $phieu['so_ngay_muon'] ?> ngày cho phiếu này?');">Gia hạn</button>
