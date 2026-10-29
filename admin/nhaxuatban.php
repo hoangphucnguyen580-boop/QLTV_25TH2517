@@ -166,7 +166,7 @@ require __DIR__ . '/../includes/admin-dau.php';
 <div class="row g-4">
     <div class="col-lg-4">
         <div class="card">
-            <div class="card-body">
+            <div class="card-body p-4">
                 <h2 class="h5 mb-3"><?= $idSua > 0 ? 'Sửa nhà xuất bản' : 'Thêm nhà xuất bản' ?></h2>
 
                 <!-- Không đặt action: form gửi về chính URL hiện tại. id nằm trong ô ẩn nên không phụ thuộc vào ?sua= -->
@@ -191,7 +191,7 @@ require __DIR__ . '/../includes/admin-dau.php';
                     </div>
 
                     <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">Lưu</button>
+                        <button type="submit" class="btn btn-primary"><img class="ic" src="../assets/icons/trang/check-circle.svg" alt="" width="16" height="16">Lưu</button>
                         <?php if ($idSua > 0): ?>
                             <a href="nhaxuatban.php" class="btn btn-outline-secondary">Hủy</a>
                         <?php endif; ?>
@@ -220,7 +220,7 @@ require __DIR__ . '/../includes/admin-dau.php';
                             <td><?= e($nxb['dia_chi'] ?? '') ?></td>
                             <td class="text-center"><?= (int) $nxb['so_sach'] ?></td>
                             <td class="text-end text-nowrap">
-                                <a href="nhaxuatban.php?sua=<?= (int) $nxb['id'] ?>" class="btn btn-sm btn-outline-secondary">Sửa</a>
+                                <a href="nhaxuatban.php?sua=<?= (int) $nxb['id'] ?>" class="btn btn-sm btn-outline-secondary"><img class="ic" src="../assets/icons/den/pencil-square.svg" alt="" width="14" height="14">Sửa</a>
                                 <form method="post" class="d-inline" onsubmit="return confirm('Xóa nhà xuất bản này?');">
                                     <input type="hidden" name="csrf" value="<?= e(taoTokenCsrf()) ?>">
                                     <input type="hidden" name="hanh_dong" value="xoa">
@@ -228,9 +228,9 @@ require __DIR__ . '/../includes/admin-dau.php';
                                     <?php if ((int) $nxb['so_sach'] > 0): ?>
                                         <!-- Chỉ để người dùng biết trước; phía máy chủ vẫn kiểm tra lại khi xóa -->
                                         <button type="button" class="btn btn-sm btn-outline-danger" disabled
-                                                title="Còn sách thuộc nhà xuất bản này">Xóa</button>
+                                                title="Còn sách thuộc nhà xuất bản này"><img class="ic" src="../assets/icons/den/trash.svg" alt="" width="14" height="14">Xóa</button>
                                     <?php else: ?>
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">Xóa</button>
+                                        <button type="submit" class="btn btn-sm btn-outline-danger"><img class="ic" src="../assets/icons/den/trash.svg" alt="" width="14" height="14">Xóa</button>
                                     <?php endif; ?>
                                 </form>
                             </td>

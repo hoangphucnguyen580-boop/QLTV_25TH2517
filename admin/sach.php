@@ -85,17 +85,17 @@ require __DIR__ . '/../includes/admin-dau.php';
 ?>
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
     <h1 class="h3 mb-0">Quản lý sách</h1>
-    <a href="sach-form.php" class="btn btn-primary">+ Thêm sách</a>
+    <a href="sach-form.php" class="btn btn-primary"><img class="ic" src="../assets/icons/trang/plus-lg.svg" alt="" width="16" height="16">Thêm sách</a>
 </div>
 
 <!-- Form tìm kiếm dùng GET nên đường link tìm kiếm có thể chép/gửi cho người khác -->
-<form method="get" class="row g-2 mb-3">
-    <div class="col-12 col-md-6">
-        <input type="text" class="form-control" name="q" value="<?= e($tuKhoa) ?>"
+<form method="get" class="row g-2 mb-3" role="search">
+    <div class="col-12 col-md-5">
+        <input type="text" class="form-control" name="q" value="<?= e($tuKhoa) ?>" aria-label="Tìm sách"
                placeholder="Tìm theo mã sách, tên sách hoặc tác giả">
     </div>
-    <div class="col-8 col-md-4">
-        <select class="form-select" name="theloai">
+    <div class="col-12 col-md-4">
+        <select class="form-select" name="theloai" aria-label="Lọc theo thể loại">
             <option value="0">Tất cả thể loại</option>
             <?php foreach ($dsTheLoai as $theLoai): ?>
                 <option value="<?= (int) $theLoai['id'] ?>"<?= ((int) $theLoai['id'] === $idTheLoai) ? ' selected' : '' ?>>
@@ -104,8 +104,12 @@ require __DIR__ . '/../includes/admin-dau.php';
             <?php endforeach; ?>
         </select>
     </div>
-    <div class="col-4 col-md-2 d-grid">
-        <button type="submit" class="btn btn-outline-primary">Tìm</button>
+    <div class="col-12 col-md-3 d-flex gap-2">
+        <button type="submit" class="btn btn-outline-primary flex-fill"><img class="ic" src="../assets/icons/den/search.svg" alt="" width="16" height="16">Tìm</button>
+        <?php if ($tuKhoa !== '' || $idTheLoai > 0): ?>
+            <!-- Chỉ hiện khi đang có bộ lọc; bấm vào là về danh sách đầy đủ -->
+            <a href="sach.php" class="btn btn-outline-secondary flex-fill"><img class="ic" src="../assets/icons/den/x-circle.svg" alt="" width="16" height="16">Xóa lọc</a>
+        <?php endif; ?>
     </div>
 </form>
 
@@ -130,11 +134,11 @@ require __DIR__ . '/../includes/admin-dau.php';
                 <tr>
                     <td>
                         <?php if ($urlAnh !== null): ?>
-                            <img src="<?= e($urlAnh) ?>" alt="Bìa <?= e($sach['ten_sach']) ?>" class="rounded border"
-                                 style="width:40px;height:56px;object-fit:cover">
+                            <img src="<?= e($urlAnh) ?>" alt="Bìa <?= e($sach['ten_sach']) ?>" class="bia bia-nho">
                         <?php else: ?>
-                            <div class="rounded border bg-secondary-subtle text-secondary d-flex align-items-center justify-content-center text-center"
-                                 style="width:40px;height:56px;font-size:.6rem;line-height:1.1">Chưa có ảnh</div>
+                            <span class="bia bia-nho" role="img" aria-label="Chưa có ảnh bìa">
+                                <img class="ic" src="../assets/icons/den/image.svg" alt="" width="18" height="18">
+                            </span>
                         <?php endif; ?>
                     </td>
                     <td><?= e($sach['ma_sach']) ?></td>
@@ -150,12 +154,12 @@ require __DIR__ . '/../includes/admin-dau.php';
                         <?php endif; ?>
                     </td>
                     <td class="text-end text-nowrap">
-                        <a href="sach-form.php?id=<?= (int) $sach['id'] ?>" class="btn btn-sm btn-outline-secondary">Sửa</a>
+                        <a href="sach-form.php?id=<?= (int) $sach['id'] ?>" class="btn btn-sm btn-outline-secondary"><img class="ic" src="../assets/icons/den/pencil-square.svg" alt="" width="14" height="14">Sửa</a>
                         <form method="post" action="sach-xoa.php" class="d-inline"
                               onsubmit="return confirm('Xóa cuốn sách này?');">
                             <input type="hidden" name="csrf" value="<?= e(taoTokenCsrf()) ?>">
                             <input type="hidden" name="id" value="<?= (int) $sach['id'] ?>">
-                            <button type="submit" class="btn btn-sm btn-outline-danger">Xóa</button>
+                            <button type="submit" class="btn btn-sm btn-outline-danger"><img class="ic" src="../assets/icons/den/trash.svg" alt="" width="14" height="14">Xóa</button>
                         </form>
                     </td>
                 </tr>

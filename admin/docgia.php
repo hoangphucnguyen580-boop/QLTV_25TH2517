@@ -108,17 +108,17 @@ require __DIR__ . '/../includes/admin-dau.php';
 ?>
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
     <h1 class="h3 mb-0">Quản lý độc giả</h1>
-    <a href="docgia-form.php" class="btn btn-primary">+ Thêm độc giả</a>
+    <a href="docgia-form.php" class="btn btn-primary"><img class="ic" src="../assets/icons/trang/plus-lg.svg" alt="" width="16" height="16">Thêm độc giả</a>
 </div>
 
 <!-- Form tìm kiếm dùng GET nên đường link tìm kiếm có thể chép/gửi cho người khác -->
-<form method="get" class="row g-2 mb-3">
-    <div class="col-12 col-md-5">
-        <input type="text" class="form-control" name="q" value="<?= e($tuKhoa) ?>"
+<form method="get" class="row g-2 mb-3" role="search">
+    <div class="col-12 col-md-4">
+        <input type="text" class="form-control" name="q" value="<?= e($tuKhoa) ?>" aria-label="Tìm độc giả"
                placeholder="Tìm theo mã, họ tên, số điện thoại hoặc email">
     </div>
-    <div class="col-6 col-md-3">
-        <select class="form-select" name="loai">
+    <div class="col-6 col-md-2">
+        <select class="form-select" name="loai" aria-label="Lọc theo loại độc giả">
             <option value="0">Tất cả loại</option>
             <?php foreach ($dsLoai as $loai): ?>
                 <option value="<?= (int) $loai['id'] ?>"<?= ((int) $loai['id'] === $idLoai) ? ' selected' : '' ?>>
@@ -128,14 +128,18 @@ require __DIR__ . '/../includes/admin-dau.php';
         </select>
     </div>
     <div class="col-6 col-md-2">
-        <select class="form-select" name="trangthai">
+        <select class="form-select" name="trangthai" aria-label="Lọc theo trạng thái">
             <option value="">Mọi trạng thái</option>
             <option value="hoat_dong"<?= $trangThai === 'hoat_dong' ? ' selected' : '' ?>>Hoạt động</option>
             <option value="khoa"<?= $trangThai === 'khoa' ? ' selected' : '' ?>>Đã khóa</option>
         </select>
     </div>
-    <div class="col-12 col-md-2 d-grid">
-        <button type="submit" class="btn btn-outline-primary">Tìm</button>
+    <div class="col-12 col-md-4 d-flex gap-2">
+        <button type="submit" class="btn btn-outline-primary flex-fill"><img class="ic" src="../assets/icons/den/search.svg" alt="" width="16" height="16">Tìm</button>
+        <?php if ($tuKhoa !== '' || $idLoai > 0 || $trangThai !== ''): ?>
+            <!-- Chỉ hiện khi đang có bộ lọc; bấm vào là về danh sách đầy đủ -->
+            <a href="docgia.php" class="btn btn-outline-secondary flex-fill"><img class="ic" src="../assets/icons/den/x-circle.svg" alt="" width="16" height="16">Xóa lọc</a>
+        <?php endif; ?>
     </div>
 </form>
 
@@ -179,7 +183,7 @@ require __DIR__ . '/../includes/admin-dau.php';
                         <?php endif; ?>
                     </td>
                     <td class="text-end text-nowrap">
-                        <a href="docgia-form.php?id=<?= (int) $docGia['id'] ?>" class="btn btn-sm btn-outline-secondary">Sửa</a>
+                        <a href="docgia-form.php?id=<?= (int) $docGia['id'] ?>" class="btn btn-sm btn-outline-secondary"><img class="ic" src="../assets/icons/den/pencil-square.svg" alt="" width="14" height="14">Sửa</a>
 
                         <!-- Khóa / mở khóa: gửi rõ trạng thái muốn đặt, không "đảo" để bấm đúp không bị lệch -->
                         <form method="post" action="docgia-khoa.php" class="d-inline">
@@ -187,10 +191,10 @@ require __DIR__ . '/../includes/admin-dau.php';
                             <input type="hidden" name="id" value="<?= (int) $docGia['id'] ?>">
                             <?php if ($docGia['trang_thai'] === 'hoat_dong'): ?>
                                 <input type="hidden" name="trang_thai" value="khoa">
-                                <button type="submit" class="btn btn-sm btn-outline-warning">Khóa</button>
+                                <button type="submit" class="btn btn-sm btn-outline-warning"><img class="ic" src="../assets/icons/den/lock.svg" alt="" width="14" height="14">Khóa</button>
                             <?php else: ?>
                                 <input type="hidden" name="trang_thai" value="hoat_dong">
-                                <button type="submit" class="btn btn-sm btn-outline-success">Mở khóa</button>
+                                <button type="submit" class="btn btn-sm btn-outline-success"><img class="ic" src="../assets/icons/den/unlock.svg" alt="" width="14" height="14">Mở khóa</button>
                             <?php endif; ?>
                         </form>
 
@@ -198,7 +202,7 @@ require __DIR__ . '/../includes/admin-dau.php';
                               onsubmit="return confirm('Xóa độc giả này?');">
                             <input type="hidden" name="csrf" value="<?= e(taoTokenCsrf()) ?>">
                             <input type="hidden" name="id" value="<?= (int) $docGia['id'] ?>">
-                            <button type="submit" class="btn btn-sm btn-outline-danger">Xóa</button>
+                            <button type="submit" class="btn btn-sm btn-outline-danger"><img class="ic" src="../assets/icons/den/trash.svg" alt="" width="14" height="14">Xóa</button>
                         </form>
                     </td>
                 </tr>

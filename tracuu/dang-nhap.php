@@ -36,49 +36,65 @@ $hetHieuLuc = (layChuoiGet('het_hieu_luc') === '1');    // tài khoản bị kh�
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Đăng nhập - Tra cứu thư viện</title>
+    <link rel="stylesheet" href="../assets/fonts/fonts.css">
     <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
 </head>
-<body class="bg-light d-flex align-items-center min-vh-100">
-<main class="container">
-    <div class="row justify-content-center">
-        <div class="col-12 col-sm-8 col-md-6 col-lg-4">
-            <div class="card shadow-sm">
-                <div class="card-body p-4">
-                    <h1 class="h4 text-center mb-1">Tra cứu thư viện</h1>
-                    <p class="text-center text-muted mb-4">Đăng nhập dành cho độc giả</p>
-
-                    <?php if ($daThoat): ?>
-                        <div class="alert alert-success py-2">Bạn đã đăng xuất.</div>
-                    <?php endif; ?>
-                    <?php if ($hetHieuLuc): ?>
-                        <div class="alert alert-warning py-2">Tài khoản của bạn hiện không dùng được. Hãy liên hệ thủ thư.</div>
-                    <?php endif; ?>
-                    <?php if ($loi !== ''): ?>
-                        <div class="alert alert-danger py-2" role="alert"><?= e($loi) ?></div>
-                    <?php endif; ?>
-
-                    <form method="post">
-                        <input type="hidden" name="csrf" value="<?= e(taoTokenCsrf()) ?>">
-                        <div class="mb-3">
-                            <label for="ma_doc_gia" class="form-label">Mã độc giả</label>
-                            <input type="text" class="form-control" id="ma_doc_gia" name="ma_doc_gia"
-                                   value="<?= e($maDocGia) ?>" maxlength="20" autocomplete="username" required autofocus>
-                        </div>
-                        <div class="mb-3">
-                            <label for="mat_khau" class="form-label">Mật khẩu</label>
-                            <input type="password" class="form-control" id="mat_khau" name="mat_khau"
-                                   autocomplete="current-password" required>
-                        </div>
-                        <button type="submit" class="btn btn-success w-100">Đăng nhập</button>
-                    </form>
-                    <p class="text-center small text-muted mt-3 mb-0">
-                        Nhập đúng mà vẫn không vào được? Hãy hỏi thủ thư.<br>
-                        <a href="../index.php">&larr; Về trang chọn</a>
-                    </p>
-                </div>
+<body class="auth-body">
+<main class="auth-wrap">
+    <div class="auth-card">
+        <div class="auth-head">
+            <img class="ic" src="../assets/icons/trang/book.svg" alt="" width="30" height="30">
+            <div>
+                <span class="logo">Tra cứu thư viện</span>
+                <small>Dành cho độc giả</small>
             </div>
         </div>
+        <div class="auth-main">
+            <h1>Đăng nhập</h1>
+            <p class="text-muted mb-4">Nhập mã độc giả và mật khẩu để xem sách bạn đang mượn.</p>
+
+            <?php if ($daThoat): ?>
+                <div class="alert alert-success alert-thong-bao py-2">
+                    <img class="ic" src="../assets/icons/den/check-circle.svg" alt="" width="20" height="20">
+                    <span>Bạn đã đăng xuất.</span>
+                </div>
+            <?php endif; ?>
+            <?php if ($hetHieuLuc): ?>
+                <div class="alert alert-warning alert-thong-bao py-2">
+                    <img class="ic" src="../assets/icons/den/exclamation-triangle.svg" alt="" width="20" height="20">
+                    <span>Tài khoản của bạn hiện không dùng được. Hãy liên hệ thủ thư.</span>
+                </div>
+            <?php endif; ?>
+            <?php if ($loi !== ''): ?>
+                <div class="alert alert-danger alert-thong-bao py-2" role="alert">
+                    <img class="ic" src="../assets/icons/den/x-circle.svg" alt="" width="20" height="20">
+                    <span><?= e($loi) ?></span>
+                </div>
+            <?php endif; ?>
+
+            <form method="post">
+                <input type="hidden" name="csrf" value="<?= e(taoTokenCsrf()) ?>">
+                <div class="mb-3">
+                    <label for="ma_doc_gia" class="form-label">Mã độc giả</label>
+                    <input type="text" class="form-control" id="ma_doc_gia" name="ma_doc_gia"
+                           value="<?= e($maDocGia) ?>" maxlength="20" autocomplete="username" required autofocus>
+                </div>
+                <div class="mb-4">
+                    <label for="mat_khau" class="form-label">Mật khẩu</label>
+                    <input type="password" class="form-control" id="mat_khau" name="mat_khau"
+                           autocomplete="current-password" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
+            </form>
+            <p class="auth-help mb-0">Nhập đúng mà vẫn không vào được? Hãy hỏi thủ thư.</p>
+        </div>
     </div>
+    <p class="auth-help">
+        <a class="auth-back" href="../index.php">
+            <img class="ic" src="../assets/icons/den/chevron-left.svg" alt="" width="14" height="14">Về trang chọn
+        </a>
+    </p>
 </main>
 </body>
 </html>

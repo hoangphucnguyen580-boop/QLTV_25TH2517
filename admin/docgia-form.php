@@ -217,7 +217,7 @@ require __DIR__ . '/../includes/admin-dau.php';
 </nav>
 
 <div class="card">
-    <div class="card-body">
+    <div class="card-body p-4">
         <h1 class="h4 mb-1"><?= e($tieuDe) ?></h1>
         <?php if ($dangSua): ?>
             <p class="text-muted mb-4">
@@ -229,102 +229,124 @@ require __DIR__ . '/../includes/admin-dau.php';
         <?php endif; ?>
 
         <?php if (count($loi) > 0): ?>
-            <div class="alert alert-danger">Chưa lưu được. Hãy sửa các ô đang viền đỏ rồi bấm Lưu lại.</div>
+            <div class="alert alert-danger alert-thong-bao" role="alert">
+                <img class="ic" src="../assets/icons/den/x-circle.svg" alt="" width="20" height="20">
+                <span>Chưa lưu được. Hãy sửa các ô đang viền đỏ rồi bấm Lưu lại.</span>
+            </div>
         <?php endif; ?>
 
         <!-- Không đặt action: form gửi về chính URL hiện tại (giữ nguyên ?id=...) -->
         <form method="post" novalidate autocomplete="off">
             <input type="hidden" name="csrf" value="<?= e(taoTokenCsrf()) ?>">
 
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <label for="ma_doc_gia" class="form-label">Mã độc giả <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control<?= lopLoi($loi, 'ma_doc_gia') ?>" id="ma_doc_gia" name="ma_doc_gia"
-                           value="<?= e($giaTri['ma_doc_gia']) ?>" maxlength="20">
-                    <?php hienLoi($loi, 'ma_doc_gia'); ?>
-                    <div class="form-text">Dùng để độc giả đăng nhập tra cứu (có thể trùng MSSV).</div>
-                </div>
-                <div class="col-md-8">
-                    <label for="ho_ten" class="form-label">Họ tên <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control<?= lopLoi($loi, 'ho_ten') ?>" id="ho_ten" name="ho_ten"
-                           value="<?= e($giaTri['ho_ten']) ?>" maxlength="100">
-                    <?php hienLoi($loi, 'ho_ten'); ?>
-                </div>
+            <!-- Khối 1: thông tin độc giả -->
+            <section class="form-block">
+                <h2 class="form-section">Thông tin độc giả</h2>
+                <p class="form-section-sub">Loại độc giả quyết định số sách được mượn và hạn mượn.</p>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="ma_doc_gia" class="form-label">Mã độc giả <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control<?= lopLoi($loi, 'ma_doc_gia') ?>" id="ma_doc_gia" name="ma_doc_gia"
+                               value="<?= e($giaTri['ma_doc_gia']) ?>" maxlength="20">
+                        <?php hienLoi($loi, 'ma_doc_gia'); ?>
+                        <div class="form-text">Dùng để độc giả đăng nhập tra cứu (có thể trùng MSSV).</div>
+                    </div>
+                    <div class="col-md-8">
+                        <label for="ho_ten" class="form-label">Họ tên <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control<?= lopLoi($loi, 'ho_ten') ?>" id="ho_ten" name="ho_ten"
+                               value="<?= e($giaTri['ho_ten']) ?>" maxlength="100">
+                        <?php hienLoi($loi, 'ho_ten'); ?>
+                    </div>
 
-                <div class="col-md-4">
-                    <label for="ngay_sinh" class="form-label">Ngày sinh</label>
-                    <input type="date" class="form-control<?= lopLoi($loi, 'ngay_sinh') ?>" id="ngay_sinh" name="ngay_sinh"
-                           value="<?= e($giaTri['ngay_sinh']) ?>" max="<?= e(date('Y-m-d')) ?>">
-                    <?php hienLoi($loi, 'ngay_sinh'); ?>
-                </div>
-                <div class="col-md-4">
-                    <label for="gioi_tinh" class="form-label">Giới tính <span class="text-danger">*</span></label>
-                    <select class="form-select<?= lopLoi($loi, 'gioi_tinh') ?>" id="gioi_tinh" name="gioi_tinh">
-                        <?php foreach ($dsGioiTinh as $ma => $ten): ?>
-                            <option value="<?= e($ma) ?>"<?= ($ma === $giaTri['gioi_tinh']) ? ' selected' : '' ?>><?= e($ten) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                    <?php hienLoi($loi, 'gioi_tinh'); ?>
-                </div>
-                <div class="col-md-4">
-                    <label for="id_loai" class="form-label">Loại độc giả <span class="text-danger">*</span></label>
-                    <select class="form-select<?= lopLoi($loi, 'id_loai') ?>" id="id_loai" name="id_loai">
-                        <option value="">-- Chọn --</option>
-                        <?php foreach ($dsLoai as $loai): ?>
-                            <option value="<?= (int) $loai['id'] ?>"<?= ((string) $loai['id'] === $giaTri['id_loai']) ? ' selected' : '' ?>>
-                                <?= e($loai['ten_loai']) ?> (<?= (int) $loai['so_sach_toi_da'] ?> cuốn / <?= (int) $loai['so_ngay_muon'] ?> ngày)
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <?php hienLoi($loi, 'id_loai'); ?>
-                </div>
-
-                <div class="col-md-4">
-                    <label for="sdt" class="form-label">Số điện thoại</label>
-                    <input type="text" inputmode="tel" class="form-control<?= lopLoi($loi, 'sdt') ?>" id="sdt" name="sdt"
-                           value="<?= e($giaTri['sdt']) ?>" maxlength="15">
-                    <?php hienLoi($loi, 'sdt'); ?>
-                </div>
-                <div class="col-md-8">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control<?= lopLoi($loi, 'email') ?>" id="email" name="email"
-                           value="<?= e($giaTri['email']) ?>" maxlength="100">
-                    <?php hienLoi($loi, 'email'); ?>
-                </div>
-
-                <div class="col-12">
-                    <label for="dia_chi" class="form-label">Địa chỉ</label>
-                    <input type="text" class="form-control<?= lopLoi($loi, 'dia_chi') ?>" id="dia_chi" name="dia_chi"
-                           value="<?= e($giaTri['dia_chi']) ?>" maxlength="255">
-                    <?php hienLoi($loi, 'dia_chi'); ?>
-                </div>
-
-                <div class="col-md-6">
-                    <label for="mat_khau" class="form-label">
-                        <?= $dangSua ? 'Mật khẩu mới' : 'Mật khẩu' ?>
-                        <?php if (!$dangSua): ?><span class="text-danger">*</span><?php endif; ?>
-                    </label>
-                    <input type="password" class="form-control<?= lopLoi($loi, 'mat_khau') ?>" id="mat_khau" name="mat_khau"
-                           autocomplete="new-password">
-                    <?php hienLoi($loi, 'mat_khau'); ?>
-                    <div class="form-text">
-                        <?= $dangSua ? 'Để trống nếu không đổi mật khẩu. ' : '' ?>Từ 6 ký tự trở lên.
+                    <div class="col-md-4">
+                        <label for="ngay_sinh" class="form-label">Ngày sinh</label>
+                        <input type="date" class="form-control<?= lopLoi($loi, 'ngay_sinh') ?>" id="ngay_sinh" name="ngay_sinh"
+                               value="<?= e($giaTri['ngay_sinh']) ?>" max="<?= e(date('Y-m-d')) ?>">
+                        <?php hienLoi($loi, 'ngay_sinh'); ?>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="gioi_tinh" class="form-label">Giới tính <span class="text-danger">*</span></label>
+                        <select class="form-select<?= lopLoi($loi, 'gioi_tinh') ?>" id="gioi_tinh" name="gioi_tinh">
+                            <?php foreach ($dsGioiTinh as $ma => $ten): ?>
+                                <option value="<?= e($ma) ?>"<?= ($ma === $giaTri['gioi_tinh']) ? ' selected' : '' ?>><?= e($ten) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <?php hienLoi($loi, 'gioi_tinh'); ?>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="id_loai" class="form-label">Loại độc giả <span class="text-danger">*</span></label>
+                        <select class="form-select<?= lopLoi($loi, 'id_loai') ?>" id="id_loai" name="id_loai">
+                            <option value="">-- Chọn --</option>
+                            <?php foreach ($dsLoai as $loai): ?>
+                                <option value="<?= (int) $loai['id'] ?>"<?= ((string) $loai['id'] === $giaTri['id_loai']) ? ' selected' : '' ?>>
+                                    <?= e($loai['ten_loai']) ?> (<?= (int) $loai['so_sach_toi_da'] ?> cuốn / <?= (int) $loai['so_ngay_muon'] ?> ngày)
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <?php hienLoi($loi, 'id_loai'); ?>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <label for="trang_thai" class="form-label">Trạng thái <span class="text-danger">*</span></label>
-                    <select class="form-select<?= lopLoi($loi, 'trang_thai') ?>" id="trang_thai" name="trang_thai">
-                        <?php foreach ($dsTrangThai as $ma => $ten): ?>
-                            <option value="<?= e($ma) ?>"<?= ($ma === $giaTri['trang_thai']) ? ' selected' : '' ?>><?= e($ten) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                    <?php hienLoi($loi, 'trang_thai'); ?>
-                    <div class="form-text">Độc giả bị khóa không đăng nhập tra cứu và không được lập phiếu mượn mới.</div>
+            </section>
+
+            <!-- Khối 2: liên hệ -->
+            <section class="form-block">
+                <h2 class="form-section">Liên hệ</h2>
+                <p class="form-section-sub">Không bắt buộc.</p>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="sdt" class="form-label">Số điện thoại</label>
+                        <input type="text" inputmode="tel" class="form-control<?= lopLoi($loi, 'sdt') ?>" id="sdt" name="sdt"
+                               value="<?= e($giaTri['sdt']) ?>" maxlength="15">
+                        <?php hienLoi($loi, 'sdt'); ?>
+                    </div>
+                    <div class="col-md-8">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control<?= lopLoi($loi, 'email') ?>" id="email" name="email"
+                               value="<?= e($giaTri['email']) ?>" maxlength="100">
+                        <?php hienLoi($loi, 'email'); ?>
+                    </div>
+
+                    <div class="col-12">
+                        <label for="dia_chi" class="form-label">Địa chỉ</label>
+                        <input type="text" class="form-control<?= lopLoi($loi, 'dia_chi') ?>" id="dia_chi" name="dia_chi"
+                               value="<?= e($giaTri['dia_chi']) ?>" maxlength="255">
+                        <?php hienLoi($loi, 'dia_chi'); ?>
+                    </div>
                 </div>
-            </div>
+            </section>
+
+            <!-- Khối 3: tài khoản -->
+            <section class="form-block">
+                <h2 class="form-section">Tài khoản tra cứu</h2>
+                <p class="form-section-sub">Độc giả dùng mã độc giả và mật khẩu này để tự đăng nhập xem sách đang mượn.</p>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="mat_khau" class="form-label">
+                            <?= $dangSua ? 'Mật khẩu mới' : 'Mật khẩu' ?>
+                            <?php if (!$dangSua): ?><span class="text-danger">*</span><?php endif; ?>
+                        </label>
+                        <input type="password" class="form-control<?= lopLoi($loi, 'mat_khau') ?>" id="mat_khau" name="mat_khau"
+                               autocomplete="new-password">
+                        <?php hienLoi($loi, 'mat_khau'); ?>
+                        <div class="form-text">
+                            <?= $dangSua ? 'Để trống nếu không đổi mật khẩu. ' : '' ?>Từ 6 ký tự trở lên.
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="trang_thai" class="form-label">Trạng thái <span class="text-danger">*</span></label>
+                        <select class="form-select<?= lopLoi($loi, 'trang_thai') ?>" id="trang_thai" name="trang_thai">
+                            <?php foreach ($dsTrangThai as $ma => $ten): ?>
+                                <option value="<?= e($ma) ?>"<?= ($ma === $giaTri['trang_thai']) ? ' selected' : '' ?>><?= e($ten) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <?php hienLoi($loi, 'trang_thai'); ?>
+                        <div class="form-text">Độc giả bị khóa không đăng nhập tra cứu và không được lập phiếu mượn mới.</div>
+                    </div>
+                </div>
+            </section>
 
             <div class="mt-4 d-flex gap-2">
-                <button type="submit" class="btn btn-primary">Lưu</button>
+                <button type="submit" class="btn btn-primary"><img class="ic" src="../assets/icons/trang/check-circle.svg" alt="" width="16" height="16">Lưu</button>
                 <a href="docgia.php" class="btn btn-outline-secondary">Hủy</a>
             </div>
         </form>

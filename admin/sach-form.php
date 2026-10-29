@@ -229,127 +229,146 @@ require __DIR__ . '/../includes/admin-dau.php';
 </nav>
 
 <div class="card">
-    <div class="card-body">
+    <div class="card-body p-4">
         <h1 class="h4 mb-4"><?= e($tieuDe) ?></h1>
 
         <?php if (count($loi) > 0): ?>
-            <div class="alert alert-danger">Chưa lưu được. Hãy sửa các ô đang viền đỏ rồi bấm Lưu lại.</div>
+            <div class="alert alert-danger alert-thong-bao" role="alert">
+                <img class="ic" src="../assets/icons/den/x-circle.svg" alt="" width="20" height="20">
+                <span>Chưa lưu được. Hãy sửa các ô đang viền đỏ rồi bấm Lưu lại.</span>
+            </div>
         <?php endif; ?>
 
         <!-- Không đặt action: form gửi về chính URL hiện tại (giữ nguyên ?id=...). enctype bắt buộc để gửi được file. -->
         <form method="post" enctype="multipart/form-data" novalidate>
             <input type="hidden" name="csrf" value="<?= e(taoTokenCsrf()) ?>">
 
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <label for="ma_sach" class="form-label">Mã sách <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control<?= lopLoi($loi, 'ma_sach') ?>" id="ma_sach" name="ma_sach"
-                           value="<?= e($giaTri['ma_sach']) ?>" maxlength="20">
-                    <?php hienLoi($loi, 'ma_sach'); ?>
-                </div>
-                <div class="col-md-8">
-                    <label for="ten_sach" class="form-label">Tên sách <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control<?= lopLoi($loi, 'ten_sach') ?>" id="ten_sach" name="ten_sach"
-                           value="<?= e($giaTri['ten_sach']) ?>" maxlength="200">
-                    <?php hienLoi($loi, 'ten_sach'); ?>
-                </div>
+            <!-- Khối 1: thông tin sách -->
+            <section class="form-block">
+                <h2 class="form-section">Thông tin sách</h2>
+                <p class="form-section-sub">Mã sách là mã duy nhất, dùng để nhập khi lập phiếu mượn.</p>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="ma_sach" class="form-label">Mã sách <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control<?= lopLoi($loi, 'ma_sach') ?>" id="ma_sach" name="ma_sach"
+                               value="<?= e($giaTri['ma_sach']) ?>" maxlength="20">
+                        <?php hienLoi($loi, 'ma_sach'); ?>
+                    </div>
+                    <div class="col-md-8">
+                        <label for="ten_sach" class="form-label">Tên sách <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control<?= lopLoi($loi, 'ten_sach') ?>" id="ten_sach" name="ten_sach"
+                               value="<?= e($giaTri['ten_sach']) ?>" maxlength="200">
+                        <?php hienLoi($loi, 'ten_sach'); ?>
+                    </div>
 
-                <div class="col-md-6">
-                    <label for="tac_gia" class="form-label">Tác giả <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control<?= lopLoi($loi, 'tac_gia') ?>" id="tac_gia" name="tac_gia"
-                           value="<?= e($giaTri['tac_gia']) ?>" maxlength="150">
-                    <?php hienLoi($loi, 'tac_gia'); ?>
-                </div>
-                <div class="col-md-3">
-                    <label for="id_theloai" class="form-label">Thể loại <span class="text-danger">*</span></label>
-                    <select class="form-select<?= lopLoi($loi, 'id_theloai') ?>" id="id_theloai" name="id_theloai">
-                        <option value="">-- Chọn --</option>
-                        <?php foreach ($dsTheLoai as $theLoai): ?>
-                            <option value="<?= (int) $theLoai['id'] ?>"<?= ((string) $theLoai['id'] === $giaTri['id_theloai']) ? ' selected' : '' ?>>
-                                <?= e($theLoai['ten_theloai']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <?php hienLoi($loi, 'id_theloai'); ?>
-                </div>
-                <div class="col-md-3">
-                    <label for="id_nxb" class="form-label">Nhà xuất bản <span class="text-danger">*</span></label>
-                    <select class="form-select<?= lopLoi($loi, 'id_nxb') ?>" id="id_nxb" name="id_nxb">
-                        <option value="">-- Chọn --</option>
-                        <?php foreach ($dsNxb as $nxb): ?>
-                            <option value="<?= (int) $nxb['id'] ?>"<?= ((string) $nxb['id'] === $giaTri['id_nxb']) ? ' selected' : '' ?>>
-                                <?= e($nxb['ten_nxb']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <?php hienLoi($loi, 'id_nxb'); ?>
-                </div>
-
-                <div class="col-6 col-md-3">
-                    <label for="nam_xuat_ban" class="form-label">Năm xuất bản</label>
-                    <input type="text" inputmode="numeric" class="form-control<?= lopLoi($loi, 'nam_xuat_ban') ?>"
-                           id="nam_xuat_ban" name="nam_xuat_ban" value="<?= e($giaTri['nam_xuat_ban']) ?>">
-                    <?php hienLoi($loi, 'nam_xuat_ban'); ?>
-                </div>
-                <div class="col-6 col-md-3">
-                    <label for="so_trang" class="form-label">Số trang</label>
-                    <input type="text" inputmode="numeric" class="form-control<?= lopLoi($loi, 'so_trang') ?>"
-                           id="so_trang" name="so_trang" value="<?= e($giaTri['so_trang']) ?>">
-                    <?php hienLoi($loi, 'so_trang'); ?>
-                </div>
-                <div class="col-6 col-md-3">
-                    <label for="gia_tien" class="form-label">Giá tiền (đồng) <span class="text-danger">*</span></label>
-                    <input type="text" inputmode="numeric" class="form-control<?= lopLoi($loi, 'gia_tien') ?>"
-                           id="gia_tien" name="gia_tien" value="<?= e($giaTri['gia_tien']) ?>">
-                    <?php hienLoi($loi, 'gia_tien'); ?>
-                </div>
-                <div class="col-6 col-md-3">
-                    <label for="so_luong" class="form-label">Tổng số bản <span class="text-danger">*</span></label>
-                    <input type="text" inputmode="numeric" class="form-control<?= lopLoi($loi, 'so_luong') ?>"
-                           id="so_luong" name="so_luong" value="<?= e($giaTri['so_luong']) ?>">
-                    <?php hienLoi($loi, 'so_luong'); ?>
-                    <?php if ($dangSua): ?>
-                        <div class="form-text">Đang có <?= $dangMuon ?> bản được mượn.</div>
-                    <?php endif; ?>
-                </div>
-
-                <div class="col-12">
-                    <label for="hinh_bia" class="form-label">Ảnh bìa</label>
-                    <div class="d-flex gap-3 align-items-start">
-                        <?php if ($urlAnhHienTai !== null): ?>
-                            <img src="<?= e($urlAnhHienTai) ?>" alt="Bìa sách hiện tại" class="rounded border"
-                                 style="width:96px;height:134px;object-fit:cover">
-                        <?php else: ?>
-                            <div class="rounded border bg-secondary-subtle text-secondary d-flex align-items-center justify-content-center text-center small"
-                                 style="width:96px;height:134px">Chưa có ảnh</div>
-                        <?php endif; ?>
-                        <div class="flex-grow-1">
-                            <input type="file" class="form-control<?= lopLoi($loi, 'hinh_bia') ?>" id="hinh_bia" name="hinh_bia"
-                                   accept="image/jpeg,image/png,image/webp">
-                            <?php hienLoi($loi, 'hinh_bia'); ?>
-                            <div class="form-text">
-                                JPG, PNG hoặc WebP, tối đa 2 MB. Nếu form báo lỗi ở ô khác thì phải chọn lại ảnh
-                                (trình duyệt không giữ lại file đã chọn).
-                            </div>
-                            <?php if ($hinhBiaDangLuu !== null && $hinhBiaDangLuu !== ''): ?>
-                                <div class="form-check mt-2">
-                                    <input class="form-check-input" type="checkbox" name="xoa_anh" value="1" id="xoa_anh">
-                                    <label class="form-check-label" for="xoa_anh">Xóa ảnh hiện tại</label>
-                                </div>
-                            <?php endif; ?>
-                        </div>
+                    <div class="col-md-6">
+                        <label for="tac_gia" class="form-label">Tác giả <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control<?= lopLoi($loi, 'tac_gia') ?>" id="tac_gia" name="tac_gia"
+                               value="<?= e($giaTri['tac_gia']) ?>" maxlength="150">
+                        <?php hienLoi($loi, 'tac_gia'); ?>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="id_theloai" class="form-label">Thể loại <span class="text-danger">*</span></label>
+                        <select class="form-select<?= lopLoi($loi, 'id_theloai') ?>" id="id_theloai" name="id_theloai">
+                            <option value="">-- Chọn --</option>
+                            <?php foreach ($dsTheLoai as $theLoai): ?>
+                                <option value="<?= (int) $theLoai['id'] ?>"<?= ((string) $theLoai['id'] === $giaTri['id_theloai']) ? ' selected' : '' ?>>
+                                    <?= e($theLoai['ten_theloai']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <?php hienLoi($loi, 'id_theloai'); ?>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="id_nxb" class="form-label">Nhà xuất bản <span class="text-danger">*</span></label>
+                        <select class="form-select<?= lopLoi($loi, 'id_nxb') ?>" id="id_nxb" name="id_nxb">
+                            <option value="">-- Chọn --</option>
+                            <?php foreach ($dsNxb as $nxb): ?>
+                                <option value="<?= (int) $nxb['id'] ?>"<?= ((string) $nxb['id'] === $giaTri['id_nxb']) ? ' selected' : '' ?>>
+                                    <?= e($nxb['ten_nxb']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <?php hienLoi($loi, 'id_nxb'); ?>
                     </div>
                 </div>
+            </section>
 
-                <div class="col-12">
-                    <label for="mo_ta" class="form-label">Mô tả</label>
-                    <textarea class="form-control<?= lopLoi($loi, 'mo_ta') ?>" id="mo_ta" name="mo_ta" rows="3"><?= e($giaTri['mo_ta']) ?></textarea>
-                    <?php hienLoi($loi, 'mo_ta'); ?>
+            <!-- Khối 2: xuất bản, giá, số lượng -->
+            <section class="form-block">
+                <h2 class="form-section">Xuất bản, giá và số lượng</h2>
+                <p class="form-section-sub">Giá tiền dùng để tính bồi thường khi độc giả làm hỏng hoặc làm mất sách.</p>
+                <div class="row g-3">
+                    <div class="col-6 col-md-3">
+                        <label for="nam_xuat_ban" class="form-label">Năm xuất bản</label>
+                        <input type="text" inputmode="numeric" class="form-control<?= lopLoi($loi, 'nam_xuat_ban') ?>"
+                               id="nam_xuat_ban" name="nam_xuat_ban" value="<?= e($giaTri['nam_xuat_ban']) ?>">
+                        <?php hienLoi($loi, 'nam_xuat_ban'); ?>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <label for="so_trang" class="form-label">Số trang</label>
+                        <input type="text" inputmode="numeric" class="form-control<?= lopLoi($loi, 'so_trang') ?>"
+                               id="so_trang" name="so_trang" value="<?= e($giaTri['so_trang']) ?>">
+                        <?php hienLoi($loi, 'so_trang'); ?>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <label for="gia_tien" class="form-label">Giá tiền (đồng) <span class="text-danger">*</span></label>
+                        <input type="text" inputmode="numeric" class="form-control<?= lopLoi($loi, 'gia_tien') ?>"
+                               id="gia_tien" name="gia_tien" value="<?= e($giaTri['gia_tien']) ?>">
+                        <?php hienLoi($loi, 'gia_tien'); ?>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <label for="so_luong" class="form-label">Tổng số bản <span class="text-danger">*</span></label>
+                        <input type="text" inputmode="numeric" class="form-control<?= lopLoi($loi, 'so_luong') ?>"
+                               id="so_luong" name="so_luong" value="<?= e($giaTri['so_luong']) ?>">
+                        <?php hienLoi($loi, 'so_luong'); ?>
+                        <?php if ($dangSua): ?>
+                            <div class="form-text">Đang có <?= $dangMuon ?> bản được mượn.</div>
+                        <?php endif; ?>
+                    </div>
                 </div>
-            </div>
+            </section>
+
+            <!-- Khối 3: ảnh bìa -->
+            <section class="form-block">
+                <h2 class="form-section"><label for="hinh_bia" class="mb-0">Ảnh bìa</label></h2>
+                <p class="form-section-sub">Không bắt buộc. Bìa hiện tại (nếu có) nằm bên trái.</p>
+                <div class="d-flex gap-3 align-items-start">
+                    <?php if ($urlAnhHienTai !== null): ?>
+                        <img src="<?= e($urlAnhHienTai) ?>" alt="Bìa sách hiện tại" class="bia bia-lon">
+                    <?php else: ?>
+                        <span class="bia bia-lon" role="img" aria-label="Chưa có ảnh bìa">
+                            <img class="ic" src="../assets/icons/den/image.svg" alt="" width="28" height="28">
+                            Chưa có ảnh
+                        </span>
+                    <?php endif; ?>
+                    <div class="flex-grow-1">
+                        <input type="file" class="form-control<?= lopLoi($loi, 'hinh_bia') ?>" id="hinh_bia" name="hinh_bia"
+                               accept="image/jpeg,image/png,image/webp">
+                        <?php hienLoi($loi, 'hinh_bia'); ?>
+                        <div class="form-text">
+                            JPG, PNG hoặc WebP, tối đa 2 MB. Nếu form báo lỗi ở ô khác thì phải chọn lại ảnh
+                            (trình duyệt không giữ lại file đã chọn).
+                        </div>
+                        <?php if ($hinhBiaDangLuu !== null && $hinhBiaDangLuu !== ''): ?>
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" name="xoa_anh" value="1" id="xoa_anh">
+                                <label class="form-check-label" for="xoa_anh">Xóa ảnh hiện tại</label>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Khối 4: mô tả -->
+            <section class="form-block">
+                <h2 class="form-section"><label for="mo_ta" class="mb-0">Mô tả</label></h2>
+                <textarea class="form-control<?= lopLoi($loi, 'mo_ta') ?>" id="mo_ta" name="mo_ta" rows="3"><?= e($giaTri['mo_ta']) ?></textarea>
+                <?php hienLoi($loi, 'mo_ta'); ?>
+            </section>
 
             <div class="mt-4 d-flex gap-2">
-                <button type="submit" class="btn btn-primary">Lưu</button>
+                <button type="submit" class="btn btn-primary"><img class="ic" src="../assets/icons/trang/check-circle.svg" alt="" width="16" height="16">Lưu</button>
                 <a href="sach.php" class="btn btn-outline-secondary">Hủy</a>
             </div>
         </form>

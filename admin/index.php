@@ -22,39 +22,41 @@ $tieuDe      = 'Trang chủ';
 $menuHienTai = 'trangchu';
 require __DIR__ . '/../includes/admin-dau.php';
 ?>
-<h1 class="h3 mb-4">Xin chào, <?= e($nhanVien['ho_ten']) ?></h1>
+<h1 class="h3 mb-1">Xin chào, <?= e($nhanVien['ho_ten']) ?></h1>
+<p class="text-muted mb-4">Tình hình thư viện hôm nay.</p>
 
 <div class="row g-3 mb-4">
     <div class="col-6 col-lg-3">
-        <div class="card text-center h-100"><div class="card-body">
-            <div class="display-6"><?= $tongSach ?></div>
-            <div class="text-muted">Đầu sách</div>
-        </div></div>
+        <div class="stat-card">
+            <div class="stat-label"><img class="ic" src="../assets/icons/den/book.svg" alt="" width="18" height="18">Đầu sách</div>
+            <div class="stat-num"><?= $tongSach ?></div>
+        </div>
     </div>
     <div class="col-6 col-lg-3">
-        <div class="card text-center h-100"><div class="card-body">
-            <div class="display-6"><?= $tongDocGia ?></div>
-            <div class="text-muted">Độc giả hoạt động</div>
-        </div></div>
+        <div class="stat-card">
+            <div class="stat-label"><img class="ic" src="../assets/icons/den/people.svg" alt="" width="18" height="18">Độc giả hoạt động</div>
+            <div class="stat-num"><?= $tongDocGia ?></div>
+        </div>
     </div>
     <div class="col-6 col-lg-3">
-        <div class="card text-center h-100"><div class="card-body">
-            <div class="display-6"><?= $phieuConHan ?></div>
-            <div class="text-muted">Phiếu đang mượn (còn hạn)</div>
-        </div></div>
+        <div class="stat-card">
+            <div class="stat-label"><img class="ic" src="../assets/icons/den/journal-text.svg" alt="" width="18" height="18">Phiếu đang mượn (còn hạn)</div>
+            <div class="stat-num"><?= $phieuConHan ?></div>
+        </div>
     </div>
     <div class="col-6 col-lg-3">
-        <div class="card text-center h-100 border-danger"><div class="card-body">
-            <div class="display-6 text-danger"><?= $phieuQuaHan ?></div>
-            <div class="text-muted">Phiếu quá hạn</div>
-        </div></div>
+        <!-- Chỉ tô đỏ khi thật sự có phiếu quá hạn; bằng 0 thì hiện như các ô khác. Ô luôn có chữ "Phiếu quá hạn". -->
+        <div class="stat-card<?= $phieuQuaHan > 0 ? ' canh-bao' : '' ?>">
+            <div class="stat-label"><img class="ic" src="../assets/icons/den/exclamation-triangle.svg" alt="" width="18" height="18">Phiếu quá hạn</div>
+            <div class="stat-num"><?= $phieuQuaHan ?></div>
+        </div>
     </div>
 </div>
 
 <div class="d-flex flex-wrap gap-2">
-    <a href="phieumuon-them.php" class="btn btn-primary">+ Lập phiếu mượn</a>
-    <a href="phieumuon.php?trangthai=qua_han" class="btn btn-outline-danger">Xem phiếu quá hạn</a>
-    <a href="thongke.php" class="btn btn-outline-primary">Thống kê</a>
-    <a href="sach.php" class="btn btn-outline-secondary">Quản lý sách</a>
+    <a href="phieumuon-them.php" class="btn btn-primary"><img class="ic" src="../assets/icons/trang/plus-lg.svg" alt="" width="16" height="16">Lập phiếu mượn</a>
+    <a href="phieumuon.php?trangthai=qua_han" class="btn btn-outline-danger"><img class="ic" src="../assets/icons/den/exclamation-triangle.svg" alt="" width="16" height="16">Xem phiếu quá hạn</a>
+    <a href="thongke.php" class="btn btn-outline-primary"><img class="ic" src="../assets/icons/den/bar-chart.svg" alt="" width="16" height="16">Thống kê</a>
+    <a href="sach.php" class="btn btn-outline-secondary"><img class="ic" src="../assets/icons/den/book.svg" alt="" width="16" height="16">Quản lý sách</a>
 </div>
 <?php require __DIR__ . '/../includes/admin-cuoi.php'; ?>
