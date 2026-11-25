@@ -74,7 +74,7 @@ $stmt = truyVan(
 );
 $tong = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
 mysqli_stmt_close($stmt);
-$numRows       = (int) $tong['so_dong'];
+$numRows        = (int) $tong['so_dong'];
 $tongPhatLichSu = (int) $tong['tong_phat'];
 $tongDenLichSu  = (int) $tong['tong_den'];
 
@@ -117,20 +117,23 @@ require __DIR__ . '/../includes/tracuu-dau.php';
 </p>
 
 <?php if ($soCuonTre > 0): ?>
-    <div class="alert alert-danger" role="alert">
-        Bạn đang giữ <strong><?= $soCuonTre ?></strong> cuốn đã quá hạn, phạt dự kiến
-        <strong><?= e(tienVND($tongPhatDuKien)) ?></strong>. Hãy mang sách trả cho thủ thư sớm.
-        Khi còn sách quá hạn bạn chưa mượn thêm được.
+    <div class="alert alert-danger alert-thong-bao" role="alert">
+        <img class="ic" src="../assets/icons/den/exclamation-triangle.svg" alt="" width="20" height="20">
+        <span>
+            Bạn đang giữ <strong><?= $soCuonTre ?></strong> cuốn đã quá hạn, phạt dự kiến
+            <strong><?= e(tienVND($tongPhatDuKien)) ?></strong>. Hãy mang sách trả cho thủ thư sớm.
+            Khi còn sách quá hạn bạn chưa mượn thêm được.
+        </span>
     </div>
 <?php endif; ?>
 
 <!-- ============ 1. Sách đang mượn ============ -->
 <div class="card mb-4">
     <div class="card-header bg-white">
-        <h2 class="h5 mb-0">Sách đang mượn</h2>
+        <h2 class="h5 mb-0"><img class="ic" src="../assets/icons/den/book.svg" alt="" width="20" height="20">Sách đang mượn</h2>
     </div>
     <div class="table-responsive">
-        <table class="table align-middle mb-0">
+        <table class="table bang-the align-middle mb-0">
             <thead class="table-light">
                 <tr>
                     <th>Sách</th>
@@ -145,20 +148,24 @@ require __DIR__ . '/../includes/tracuu-dau.php';
             <?php foreach ($dsDangMuon as $cuon): ?>
                 <?php [$nhan, $mau] = nhanHanTra((int) $cuon['so_ngay_con']); ?>
                 <tr>
-                    <td>
-                        <?= e($cuon['ten_sach']) ?>
-                        <div class="small text-muted"><?= e($cuon['ma_sach']) ?> &middot; <?= e($cuon['tac_gia']) ?></div>
+                    <td class="the-dau">
+                        <div>
+                            <?= e($cuon['ten_sach']) ?>
+                            <div class="small text-muted"><?= e($cuon['ma_sach']) ?> &middot; <?= e($cuon['tac_gia']) ?></div>
+                        </div>
                     </td>
-                    <td><?= e($cuon['ma_phieu']) ?></td>
-                    <td><?= e(ngayVN($cuon['ngay_muon'])) ?></td>
-                    <td>
-                        <?= e(ngayVN($cuon['ngay_hen_tra'])) ?>
-                        <?php if ((int) $cuon['so_lan_gia_han_da_dung'] > 0): ?>
-                            <div class="small text-muted">đã gia hạn <?= (int) $cuon['so_lan_gia_han_da_dung'] ?>/<?= (int) $docGia['so_lan_gia_han'] ?> lần</div>
-                        <?php endif; ?>
+                    <td data-nhan="Phiếu"><?= e($cuon['ma_phieu']) ?></td>
+                    <td data-nhan="Ngày mượn"><?= e(ngayVN($cuon['ngay_muon'])) ?></td>
+                    <td data-nhan="Hạn trả">
+                        <div>
+                            <?= e(ngayVN($cuon['ngay_hen_tra'])) ?>
+                            <?php if ((int) $cuon['so_lan_gia_han_da_dung'] > 0): ?>
+                                <div class="small text-muted">đã gia hạn <?= (int) $cuon['so_lan_gia_han_da_dung'] ?>/<?= (int) $docGia['so_lan_gia_han'] ?> lần</div>
+                            <?php endif; ?>
+                        </div>
                     </td>
-                    <td><span class="badge text-bg-<?= $mau ?>"><?= e($nhan) ?></span></td>
-                    <td class="text-end"><?= (int) $cuon['phat_du_kien'] > 0 ? e(tienVND($cuon['phat_du_kien'])) : '&mdash;' ?></td>
+                    <td class="the-trang-thai"><span class="badge text-bg-<?= $mau ?>"><?= e($nhan) ?></span></td>
+                    <td class="text-end" data-nhan="Phạt dự kiến"><?= (int) $cuon['phat_du_kien'] > 0 ? e(tienVND($cuon['phat_du_kien'])) : '&mdash;' ?></td>
                 </tr>
             <?php endforeach; ?>
             <?php if (count($dsDangMuon) === 0): ?>
@@ -176,14 +183,14 @@ require __DIR__ . '/../includes/tracuu-dau.php';
 <!-- ============ 2. Lịch sử mượn - trả ============ -->
 <div class="card mb-4" id="lich-su">
     <div class="card-header bg-white d-flex flex-wrap justify-content-between align-items-center gap-2">
-        <h2 class="h5 mb-0">Lịch sử mượn - trả</h2>
+        <h2 class="h5 mb-0"><img class="ic" src="../assets/icons/den/journal-text.svg" alt="" width="20" height="20">Lịch sử mượn - trả</h2>
         <span class="text-muted">
             Tổng phạt trễ <strong><?= e(tienVND($tongPhatLichSu)) ?></strong>
             &middot; tổng bồi thường <strong><?= e(tienVND($tongDenLichSu)) ?></strong>
         </span>
     </div>
     <div class="table-responsive">
-        <table class="table align-middle mb-0">
+        <table class="table bang-the align-middle mb-0">
             <thead class="table-light">
                 <tr>
                     <th>Sách</th>
@@ -198,29 +205,31 @@ require __DIR__ . '/../includes/tracuu-dau.php';
             </thead>
             <tbody>
             <?php foreach ($dsLichSu as $dong): ?>
+                <?php
+                $tinhTra    = (string) $dong['tinh_trang_tra'];
+                $mauTinhTra = ['nguyen_ven' => 'success', 'hu_hong' => 'warning', 'mat' => 'danger'][$tinhTra] ?? 'secondary';
+                ?>
                 <tr>
-                    <td>
-                        <?= e($dong['ten_sach']) ?>
-                        <div class="small text-muted"><?= e($dong['ma_sach']) ?></div>
+                    <td class="the-dau">
+                        <div>
+                            <?= e($dong['ten_sach']) ?>
+                            <div class="small text-muted"><?= e($dong['ma_sach']) ?></div>
+                        </div>
                     </td>
-                    <td><?= e($dong['ma_phieu']) ?></td>
-                    <td><?= e(ngayVN($dong['ngay_muon'])) ?></td>
-                    <td><?= e(ngayVN($dong['ngay_hen_tra'])) ?></td>
-                    <td>
-                        <?= e(ngayVN($dong['ngay_tra_thuc_te'])) ?>
-                        <?php if ((int) $dong['so_ngay_tre'] > 0): ?>
-                            <div class="small text-danger">trễ <?= (int) $dong['so_ngay_tre'] ?> ngày</div>
-                        <?php endif; ?>
+                    <td data-nhan="Phiếu"><?= e($dong['ma_phieu']) ?></td>
+                    <td data-nhan="Ngày mượn"><?= e(ngayVN($dong['ngay_muon'])) ?></td>
+                    <td data-nhan="Hẹn trả"><?= e(ngayVN($dong['ngay_hen_tra'])) ?></td>
+                    <td data-nhan="Ngày trả">
+                        <div>
+                            <?= e(ngayVN($dong['ngay_tra_thuc_te'])) ?>
+                            <?php if ((int) $dong['so_ngay_tre'] > 0): ?>
+                                <div class="small text-danger">trễ <?= (int) $dong['so_ngay_tre'] ?> ngày</div>
+                            <?php endif; ?>
+                        </div>
                     </td>
-                    <td>
-                        <?php
-                        $tinhTra = (string) $dong['tinh_trang_tra'];
-                        $mauTinhTra = ['nguyen_ven' => 'success', 'hu_hong' => 'warning', 'mat' => 'danger'][$tinhTra] ?? 'secondary';
-                        ?>
-                        <span class="badge text-bg-<?= $mauTinhTra ?>"><?= e(TINH_TRANG_TRA[$tinhTra] ?? '') ?></span>
-                    </td>
-                    <td class="text-end"><?= e(tienVND($dong['tien_phat'])) ?></td>
-                    <td class="text-end"><?= e(tienVND($dong['tien_boi_thuong'])) ?></td>
+                    <td class="the-trang-thai"><span class="badge text-bg-<?= $mauTinhTra ?>"><?= e(TINH_TRANG_TRA[$tinhTra] ?? '') ?></span></td>
+                    <td class="text-end" data-nhan="Phạt trễ"><?= e(tienVND($dong['tien_phat'])) ?></td>
+                    <td class="text-end" data-nhan="Bồi thường"><?= e(tienVND($dong['tien_boi_thuong'])) ?></td>
                 </tr>
             <?php endforeach; ?>
             <?php if ($numRows === 0): ?>

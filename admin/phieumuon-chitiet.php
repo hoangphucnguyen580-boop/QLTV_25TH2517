@@ -84,14 +84,14 @@ require __DIR__ . '/../includes/admin-dau.php';
 </nav>
 
 <div class="card mb-4">
-    <div class="card-body">
-        <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+    <div class="card-body p-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
             <h1 class="h4 mb-0">Phiếu <?= e($phieu['ma_phieu']) ?>
-                <span class="badge text-bg-<?= $mauTrangThai ?> ms-2"><?= e($nhanTrangThai) ?></span>
+                <span class="badge text-bg-<?= $mauTrangThai ?> ms-2 align-middle"><?= e($nhanTrangThai) ?></span>
             </h1>
             <div class="d-flex flex-wrap gap-2">
                 <!-- Lập xong một phiếu thì bấm đây để nhập luôn phiếu cho người kế tiếp -->
-                <a href="phieumuon-them.php" class="btn btn-primary">+ Lập phiếu mới</a>
+                <a href="phieumuon-them.php" class="btn btn-outline-primary"><img class="ic" src="../assets/icons/den/plus-lg.svg" alt="" width="16" height="16">Lập phiếu mới</a>
                 <form method="post" action="phieumuon-giahan.php">
                     <input type="hidden" name="csrf" value="<?= e(taoTokenCsrf()) ?>">
                     <input type="hidden" name="id" value="<?= (int) $phieu['id'] ?>">
@@ -99,10 +99,10 @@ require __DIR__ . '/../includes/admin-dau.php';
                     <input type="hidden" name="lan_da_dung" value="<?= (int) $phieu['so_lan_gia_han_da_dung'] ?>">
                     <?php if ($lyDoKhongGiaHan === ''): ?>
                         <button type="submit" class="btn btn-outline-primary"
-                                onclick="return confirm('Gia hạn thêm <?= (int) $phieu['so_ngay_muon'] ?> ngày cho phiếu này?');">Gia hạn</button>
+                                onclick="return confirm('Gia hạn thêm <?= (int) $phieu['so_ngay_muon'] ?> ngày cho phiếu này?');"><img class="ic" src="../assets/icons/den/arrow-repeat.svg" alt="" width="16" height="16">Gia hạn</button>
                     <?php else: ?>
                         <button type="button" class="btn btn-outline-primary" disabled
-                                title="<?= e($lyDoKhongGiaHan) ?>">Gia hạn</button>
+                                title="<?= e($lyDoKhongGiaHan) ?>"><img class="ic" src="../assets/icons/den/arrow-repeat.svg" alt="" width="16" height="16">Gia hạn</button>
                     <?php endif; ?>
                 </form>
                 <?php if ($soChuaTra > 0): ?>
@@ -111,21 +111,26 @@ require __DIR__ . '/../includes/admin-dau.php';
                         <input type="hidden" name="csrf" value="<?= e(taoTokenCsrf()) ?>">
                         <input type="hidden" name="hanh_dong" value="tra_het">
                         <input type="hidden" name="id_phieu" value="<?= (int) $phieu['id'] ?>">
-                        <button type="submit" class="btn btn-success">Trả hết phiếu (nguyên vẹn)</button>
+                        <button type="submit" class="btn btn-success"><img class="ic" src="../assets/icons/trang/check-circle.svg" alt="" width="16" height="16">Trả hết phiếu (nguyên vẹn)</button>
                     </form>
                 <?php endif; ?>
             </div>
         </div>
 
-        <div class="row g-3">
+        <?php if ($lyDoKhongGiaHan !== '' && $soChuaTra > 0): ?>
+            <!-- Nói thẳng vì sao không gia hạn được (nút bị tắt trên điện thoại không có tooltip) -->
+            <p class="text-muted small mb-4">Không gia hạn được: <?= e($lyDoKhongGiaHan) ?></p>
+        <?php endif; ?>
+
+        <div class="row g-4">
             <div class="col-md-6">
                 <dl class="row mb-0">
                     <dt class="col-sm-4">Độc giả</dt>
-                    <dd class="col-sm-8"><?= e($phieu['ho_ten']) ?> (<?= e($phieu['ma_doc_gia']) ?>)</dd>
+                    <dd class="col-sm-8"><?= e($phieu['ho_ten']) ?> <span class="text-muted">(<?= e($phieu['ma_doc_gia']) ?>)</span></dd>
                     <dt class="col-sm-4">Loại</dt>
                     <dd class="col-sm-8"><?= e($phieu['ten_loai']) ?></dd>
                     <dt class="col-sm-4">Thủ thư lập</dt>
-                    <dd class="col-sm-8"><?= e($phieu['ten_nhan_vien']) ?></dd>
+                    <dd class="col-sm-8 mb-0"><?= e($phieu['ten_nhan_vien']) ?></dd>
                 </dl>
             </div>
             <div class="col-md-6">
@@ -133,13 +138,13 @@ require __DIR__ . '/../includes/admin-dau.php';
                     <dt class="col-sm-4">Ngày mượn</dt>
                     <dd class="col-sm-8"><?= e(ngayVN($phieu['ngay_muon'])) ?></dd>
                     <dt class="col-sm-4">Hẹn trả</dt>
-                    <dd class="col-sm-8"><?= e(ngayVN($phieu['ngay_hen_tra'])) ?></dd>
-                    <dt class="col-sm-4">Gia hạn</dt>
-                    <dd class="col-sm-8"><?= (int) $phieu['so_lan_gia_han_da_dung'] ?> / <?= (int) $phieu['so_lan_gia_han'] ?> lần
-                        <?php if ($lyDoKhongGiaHan !== '' && $soChuaTra > 0): ?>
-                            <span class="text-muted small">(<?= e($lyDoKhongGiaHan) ?>)</span>
+                    <dd class="col-sm-8"><?= e(ngayVN($phieu['ngay_hen_tra'])) ?>
+                        <?php if ($soNgayTre > 0 && $soChuaTra > 0): ?>
+                            <span class="text-danger small">(trễ <?= $soNgayTre ?> ngày)</span>
                         <?php endif; ?>
                     </dd>
+                    <dt class="col-sm-4">Gia hạn</dt>
+                    <dd class="col-sm-8 mb-0"><?= (int) $phieu['so_lan_gia_han_da_dung'] ?> / <?= (int) $phieu['so_lan_gia_han'] ?> lần</dd>
                 </dl>
             </div>
         </div>
@@ -148,7 +153,7 @@ require __DIR__ . '/../includes/admin-dau.php';
 
 <div class="card">
     <div class="table-responsive">
-        <table class="table align-middle mb-0">
+        <table class="table bang-the align-middle mb-0">
             <thead class="table-light">
                 <tr>
                     <th>Mã</th>
@@ -162,60 +167,65 @@ require __DIR__ . '/../includes/admin-dau.php';
             <tbody>
             <?php foreach ($dsCuon as $cuon): ?>
                 <tr>
-                    <td><?= e($cuon['ma_sach']) ?></td>
-                    <td><?= e($cuon['ten_sach']) ?></td>
+                    <td data-nhan="Mã sách"><?= e($cuon['ma_sach']) ?></td>
+                    <td class="the-dau"><?= e($cuon['ten_sach']) ?></td>
                     <?php if ($cuon['ngay_tra_thuc_te'] === null): ?>
-                        <td>
+                        <td class="the-trang-thai">
                             <span class="badge text-bg-<?= $soNgayTre > 0 ? 'danger' : 'primary' ?>">Chưa trả</span>
                             <?php if ($soNgayTre > 0): ?>
                                 <div class="small text-danger">Trễ <?= $soNgayTre ?> ngày</div>
                             <?php endif; ?>
                         </td>
-                        <td class="text-end">
+                        <td class="text-end" data-nhan="Phạt trễ">
                             <?php if ($soNgayTre > 0): ?>
-                                <span class="text-muted small">dự kiến</span> <?= e(tienVND(tinhTienPhat($soNgayTre, $tienPhatMoiNgay))) ?>
+                                <span><span class="text-muted small">dự kiến</span> <?= e(tienVND(tinhTienPhat($soNgayTre, $tienPhatMoiNgay))) ?></span>
                             <?php else: ?>
                                 0đ
                             <?php endif; ?>
                         </td>
-                        <td class="text-end text-muted">&mdash;</td>
-                        <td class="text-end">
+                        <td class="text-end text-muted" data-nhan="Bồi thường">&mdash;</td>
+                        <td class="text-end cot-thao-tac">
                             <form method="post" action="phieumuon-tra.php" class="d-inline-flex gap-1 justify-content-end"
                                   onsubmit="return this.tinh_trang.value !== 'mat' || confirm('Xác nhận cuốn này bị MẤT? Độc giả đền gấp đôi giá sách và tổng số bản của sách giảm 1.');">
                                 <input type="hidden" name="csrf" value="<?= e(taoTokenCsrf()) ?>">
                                 <input type="hidden" name="hanh_dong" value="tra_mot">
                                 <input type="hidden" name="id_chi_tiet" value="<?= (int) $cuon['id'] ?>">
-                                <select name="tinh_trang" class="form-select form-select-sm w-auto" aria-label="Tình trạng khi trả">
+                                <select name="tinh_trang" class="form-select form-select-sm w-auto" aria-label="Tình trạng khi trả <?= e($cuon['ten_sach']) ?>">
                                     <?php foreach (TINH_TRANG_TRA as $ma => $nhan): ?>
                                         <option value="<?= e($ma) ?>"><?= e($nhan) ?></option>
                                     <?php endforeach; ?>
                                 </select>
-                                <button type="submit" class="btn btn-sm btn-success">Trả</button>
+                                <button type="submit" class="btn btn-sm btn-success"><img class="ic" src="../assets/icons/trang/arrow-return-left.svg" alt="" width="14" height="14">Trả</button>
                             </form>
                         </td>
                     <?php else: ?>
-                        <td>
+                        <td class="the-trang-thai">
                             <span class="badge text-bg-<?= $cuon['tinh_trang_tra'] === 'nguyen_ven' ? 'success' : 'warning' ?>">
                                 <?= e(TINH_TRANG_TRA[$cuon['tinh_trang_tra']] ?? '') ?>
                             </span>
                             <div class="small text-muted">Trả ngày <?= e(ngayVN($cuon['ngay_tra_thuc_te'])) ?></div>
                         </td>
-                        <td class="text-end"><?= e(tienVND($cuon['tien_phat'])) ?></td>
-                        <td class="text-end"><?= e(tienVND($cuon['tien_boi_thuong'])) ?></td>
-                        <td class="text-end text-muted">Đã trả</td>
+                        <td class="text-end" data-nhan="Phạt trễ"><?= e(tienVND($cuon['tien_phat'])) ?></td>
+                        <td class="text-end" data-nhan="Bồi thường"><?= e(tienVND($cuon['tien_boi_thuong'])) ?></td>
+                        <!-- Đã trả rồi thì cột này chỉ là chữ nhắc; trong thẻ điện thoại bỏ đi cho gọn (badge đã nói "đã trả") -->
+                        <td class="text-end text-muted d-none d-md-table-cell">Đã trả</td>
                     <?php endif; ?>
                 </tr>
             <?php endforeach; ?>
             </tbody>
             <tfoot class="table-light">
                 <tr>
-                    <th colspan="3" class="text-end">Tổng đã phát sinh</th>
-                    <th class="text-end"><?= e(tienVND($tongPhat)) ?></th>
-                    <th class="text-end"><?= e(tienVND($tongDen)) ?></th>
-                    <th></th>
+                    <th colspan="3" class="text-end the-tong-nhan">Tổng đã phát sinh</th>
+                    <th class="text-end" data-nhan="Phạt trễ"><?= e(tienVND($tongPhat)) ?></th>
+                    <th class="text-end" data-nhan="Bồi thường"><?= e(tienVND($tongDen)) ?></th>
+                    <th class="d-none d-md-table-cell"></th>
                 </tr>
             </tfoot>
         </table>
     </div>
+</div>
+<div class="mt-3 d-flex flex-wrap gap-2">
+    <a href="phieumuon.php" class="btn btn-outline-secondary"><img class="ic" src="../assets/icons/den/arrow-return-left.svg" alt="" width="16" height="16">Về danh sách phiếu</a>
+    <a href="index.php" class="btn btn-outline-secondary"><img class="ic" src="../assets/icons/den/house.svg" alt="" width="16" height="16">Về trang chủ</a>
 </div>
 <?php require __DIR__ . '/../includes/admin-cuoi.php'; ?>

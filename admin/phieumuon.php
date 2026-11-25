@@ -96,31 +96,36 @@ require __DIR__ . '/../includes/admin-dau.php';
 ?>
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
     <h1 class="h3 mb-0">Phiếu mượn</h1>
-    <a href="phieumuon-them.php" class="btn btn-primary">+ Lập phiếu mượn</a>
+    <a href="phieumuon-them.php" class="btn btn-primary"><img class="ic" src="../assets/icons/trang/plus-lg.svg" alt="" width="16" height="16">Lập phiếu mượn</a>
 </div>
 
 <!-- Form tìm kiếm dùng GET nên đường link tìm kiếm có thể chép/gửi cho người khác -->
-<form method="get" class="row g-2 mb-3">
-    <div class="col-12 col-md-6">
-        <input type="text" class="form-control" name="q" value="<?= e($tuKhoa) ?>"
+<form method="get" class="row g-2 mb-3" role="search">
+    <div class="col-12 col-md-5">
+        <input type="text" class="form-control" name="q" value="<?= e($tuKhoa) ?>" aria-label="Tìm phiếu mượn"
                placeholder="Tìm theo mã phiếu, mã độc giả hoặc họ tên">
     </div>
-    <div class="col-8 col-md-4">
-        <select class="form-select" name="trangthai">
+    <div class="col-12 col-md-3">
+        <select class="form-select" name="trangthai" aria-label="Lọc theo trạng thái">
             <option value="">Mọi trạng thái</option>
             <option value="dang_muon"<?= $trangThai === 'dang_muon' ? ' selected' : '' ?>>Đang mượn (còn hạn)</option>
             <option value="qua_han"<?= $trangThai === 'qua_han' ? ' selected' : '' ?>>Quá hạn</option>
             <option value="da_tra"<?= $trangThai === 'da_tra' ? ' selected' : '' ?>>Đã trả hết</option>
         </select>
     </div>
-    <div class="col-4 col-md-2 d-grid">
-        <button type="submit" class="btn btn-outline-primary">Tìm</button>
+    <div class="col-12 col-md-4 d-flex gap-2">
+        <button type="submit" class="btn btn-outline-primary flex-fill"><img class="ic" src="../assets/icons/den/search.svg" alt="" width="16" height="16">Tìm</button>
+        <?php if ($tuKhoa !== '' || $trangThai !== ''): ?>
+            <!-- Chỉ hiện khi đang có bộ lọc; bấm vào là về danh sách đầy đủ -->
+            <a href="phieumuon.php" class="btn btn-outline-secondary flex-fill"><img class="ic" src="../assets/icons/den/x-circle.svg" alt="" width="16" height="16">Xóa lọc</a>
+        <?php endif; ?>
     </div>
 </form>
 
 <div class="card">
     <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
+        <!-- bang-the: từ màn hình hẹp (< 768px) mỗi dòng thành một thẻ, xem app.css phần 12 -->
+        <table class="table table-hover align-middle mb-0 bang-the">
             <thead class="table-light">
                 <tr>
                     <th>Mã phiếu</th>
@@ -136,17 +141,19 @@ require __DIR__ . '/../includes/admin-dau.php';
             <?php foreach ($dsPhieu as $phieu): ?>
                 <?php [$nhan, $mau] = nhanTrangThaiPhieu((int) $phieu['chua_tra'], (int) $phieu['so_ngay_tre']); ?>
                 <tr>
-                    <td><?= e($phieu['ma_phieu']) ?></td>
-                    <td>
-                        <?= e($phieu['ho_ten']) ?>
-                        <div class="small text-muted"><?= e($phieu['ma_doc_gia']) ?></div>
+                    <td class="the-dau"><?= e($phieu['ma_phieu']) ?></td>
+                    <td data-nhan="Độc giả">
+                        <div>
+                            <?= e($phieu['ho_ten']) ?>
+                            <div class="small text-muted"><?= e($phieu['ma_doc_gia']) ?></div>
+                        </div>
                     </td>
-                    <td><?= e(ngayVN($phieu['ngay_muon'])) ?></td>
-                    <td><?= e(ngayVN($phieu['ngay_hen_tra'])) ?></td>
-                    <td class="text-center"><?= (int) $phieu['chua_tra'] ?> / <?= (int) $phieu['tong_cuon'] ?></td>
-                    <td><span class="badge text-bg-<?= $mau ?>"><?= e($nhan) ?></span></td>
-                    <td class="text-end text-nowrap">
-                        <a href="phieumuon-chitiet.php?id=<?= (int) $phieu['id'] ?>" class="btn btn-sm btn-outline-primary">Chi tiết</a>
+                    <td data-nhan="Ngày mượn"><?= e(ngayVN($phieu['ngay_muon'])) ?></td>
+                    <td data-nhan="Hẹn trả"><?= e(ngayVN($phieu['ngay_hen_tra'])) ?></td>
+                    <td class="text-center" data-nhan="Chưa trả / Tổng"><?= (int) $phieu['chua_tra'] ?> / <?= (int) $phieu['tong_cuon'] ?></td>
+                    <td class="the-trang-thai"><span class="badge text-bg-<?= $mau ?>"><?= e($nhan) ?></span></td>
+                    <td class="text-end text-nowrap cot-thao-tac">
+                        <a href="phieumuon-chitiet.php?id=<?= (int) $phieu['id'] ?>" class="btn btn-sm btn-outline-primary">Chi tiết<img class="ic ms-1 me-0" src="../assets/icons/den/chevron-right.svg" alt="" width="14" height="14"></a>
                     </td>
                 </tr>
             <?php endforeach; ?>

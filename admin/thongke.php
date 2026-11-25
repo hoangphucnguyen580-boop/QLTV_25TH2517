@@ -175,10 +175,32 @@ require __DIR__ . '/../includes/admin-dau.php';
 ?>
 <h1 class="h3 mb-3">Thống kê</h1>
 
+<!-- Ba con số tóm tắt: lấy từ các biến đã tính ở trên, không truy vấn thêm -->
+<div class="row g-3 mb-4">
+    <div class="col-12 col-md-4">
+        <div class="stat-card<?= count($docGiaTre) > 0 ? ' canh-bao' : '' ?>">
+            <div class="stat-label"><img class="ic" src="../assets/icons/den/exclamation-triangle.svg" alt="" width="18" height="18">Độc giả đang trễ hạn</div>
+            <div class="stat-num"><?= count($docGiaTre) ?></div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4">
+        <div class="stat-card">
+            <div class="stat-label"><img class="ic" src="../assets/icons/den/cash-coin.svg" alt="" width="18" height="18">Phạt dự kiến</div>
+            <div class="stat-num stat-tien"><?= e(tienVND($tongPhatDuKien)) ?></div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4">
+        <div class="stat-card">
+            <div class="stat-label"><img class="ic" src="../assets/icons/den/cash-coin.svg" alt="" width="18" height="18">Đã thu<?= $dangLoc ? ' trong kỳ lọc' : '' ?></div>
+            <div class="stat-num stat-tien"><?= e(tienVND($tongPhat + $tongBoiThuong)) ?></div>
+        </div>
+    </div>
+</div>
+
 <!-- Bộ lọc dùng GET nên đường link có thể chép/gửi cho người khác -->
 <div class="card mb-4">
     <div class="card-body">
-        <form method="get" class="row g-2 align-items-end" novalidate>
+        <form method="get" class="row g-2 align-items-start" novalidate>
             <div class="col-6 col-md-3">
                 <label for="tu" class="form-label mb-1">Từ ngày</label>
                 <input type="date" class="form-control<?= lopLoi($loiLoc, 'tu') ?>" id="tu" name="tu"
@@ -191,11 +213,15 @@ require __DIR__ . '/../includes/admin-dau.php';
                        value="<?= e($denNgay) ?>">
                 <?php hienLoi($loiLoc, 'den'); ?>
             </div>
-            <div class="col-12 col-md-auto d-flex gap-2">
-                <button type="submit" class="btn btn-outline-primary">Lọc</button>
-                <?php if ($dangLoc || count($loiLoc) > 0): ?>
-                    <a href="thongke.php" class="btn btn-outline-secondary">Bỏ lọc</a>
-                <?php endif; ?>
+            <div class="col-12 col-md-auto loc-nut">
+                <!-- Nhãn tàng hình cùng kiểu với nhãn "Từ ngày": đẩy nút xuống đúng bằng chiều cao nhãn, không cần đoán số px -->
+                <span class="form-label mb-1 d-none d-md-block invisible" aria-hidden="true">&nbsp;</span>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-outline-primary"><img class="ic" src="../assets/icons/den/funnel.svg" alt="" width="16" height="16">Lọc</button>
+                    <?php if ($dangLoc || count($loiLoc) > 0): ?>
+                        <a href="thongke.php" class="btn btn-outline-secondary"><img class="ic" src="../assets/icons/den/x-circle.svg" alt="" width="16" height="16">Bỏ lọc</a>
+                    <?php endif; ?>
+                </div>
             </div>
         </form>
         <div class="form-text mt-2">
@@ -211,7 +237,7 @@ require __DIR__ . '/../includes/admin-dau.php';
         <h2 class="h5 mb-0">1. Sách được mượn nhiều nhất <span class="text-muted fs-6">(top <?= $soSachHienThi ?>)</span></h2>
     </div>
     <div class="table-responsive">
-        <table class="table align-middle mb-0">
+        <table class="table bang-the align-middle mb-0">
             <thead class="table-light">
                 <tr>
                     <th style="width:3rem">#</th>
@@ -225,12 +251,13 @@ require __DIR__ . '/../includes/admin-dau.php';
             <tbody>
             <?php foreach ($dsSachNhieu as $thuTu => $sach): ?>
                 <tr>
-                    <td><?= $thuTu + 1 ?></td>
-                    <td><?= e($sach['ma_sach']) ?></td>
-                    <td><?= e($sach['ten_sach']) ?></td>
-                    <td><?= e($sach['tac_gia']) ?></td>
-                    <td class="text-end"><?= (int) $sach['luot_muon'] ?></td>
-                    <td>
+                    <!-- Máy tính: cột # riêng. Điện thoại: số thứ tự nằm ngay trước tên sách trong tiêu đề thẻ -->
+                    <td class="d-none d-md-table-cell"><?= $thuTu + 1 ?></td>
+                    <td data-nhan="Mã"><?= e($sach['ma_sach']) ?></td>
+                    <td class="the-dau"><span class="text-muted d-md-none"><?= $thuTu + 1 ?>.</span> <?= e($sach['ten_sach']) ?></td>
+                    <td data-nhan="Tác giả"><?= e($sach['tac_gia']) ?></td>
+                    <td class="text-end" data-nhan="Lượt mượn"><?= (int) $sach['luot_muon'] ?></td>
+                    <td data-nhan="Biểu đồ">
                         <div class="progress" style="height:.9rem" role="img"
                              aria-label="<?= (int) $sach['luot_muon'] ?> lượt mượn">
                             <div class="progress-bar" style="width:<?= phanTram((int) $sach['luot_muon'], $luotLonNhat) ?>%"></div>
@@ -256,7 +283,7 @@ require __DIR__ . '/../includes/admin-dau.php';
         </span>
     </div>
     <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
+        <table class="table table-hover bang-the align-middle mb-0">
             <thead class="table-light">
                 <tr>
                     <th>Độc giả</th>
@@ -270,17 +297,19 @@ require __DIR__ . '/../includes/admin-dau.php';
             <tbody>
             <?php foreach ($dsTreHan as $phieu): ?>
                 <tr>
-                    <td>
-                        <?= e($phieu['ho_ten']) ?>
-                        <div class="small text-muted">
-                            <?= e($phieu['ma_doc_gia']) ?><?php if ($phieu['sdt'] !== null && $phieu['sdt'] !== ''): ?> &middot; <?= e($phieu['sdt']) ?><?php endif; ?>
+                    <td class="the-dau">
+                        <div>
+                            <?= e($phieu['ho_ten']) ?>
+                            <div class="small text-muted">
+                                <?= e($phieu['ma_doc_gia']) ?><?php if ($phieu['sdt'] !== null && $phieu['sdt'] !== ''): ?> &middot; <?= e($phieu['sdt']) ?><?php endif; ?>
+                            </div>
                         </div>
                     </td>
-                    <td><a href="phieumuon-chitiet.php?id=<?= (int) $phieu['id'] ?>"><?= e($phieu['ma_phieu']) ?></a></td>
-                    <td><?= e(ngayVN($phieu['ngay_hen_tra'])) ?></td>
-                    <td class="text-center"><?= (int) $phieu['so_cuon_tre'] ?></td>
-                    <td class="text-center"><span class="badge text-bg-danger"><?= (int) $phieu['so_ngay_tre'] ?></span></td>
-                    <td class="text-end"><?= e(tienVND($phieu['phat_du_kien'])) ?></td>
+                    <td data-nhan="Phiếu"><a href="phieumuon-chitiet.php?id=<?= (int) $phieu['id'] ?>"><?= e($phieu['ma_phieu']) ?></a></td>
+                    <td data-nhan="Hẹn trả"><?= e(ngayVN($phieu['ngay_hen_tra'])) ?></td>
+                    <td class="text-center" data-nhan="Cuốn trễ"><?= (int) $phieu['so_cuon_tre'] ?></td>
+                    <td class="text-center the-trang-thai"><span class="badge text-bg-danger">Trễ <?= (int) $phieu['so_ngay_tre'] ?> ngày</span></td>
+                    <td class="text-end" data-nhan="Phạt dự kiến"><?= e(tienVND($phieu['phat_du_kien'])) ?></td>
                 </tr>
             <?php endforeach; ?>
             <?php if (count($dsTreHan) === 0): ?>
@@ -301,7 +330,7 @@ require __DIR__ . '/../includes/admin-dau.php';
         <h2 class="h5 mb-0">3. Tiền phạt và bồi thường theo tháng</h2>
     </div>
     <div class="table-responsive">
-        <table class="table align-middle mb-0">
+        <table class="table bang-the align-middle mb-0">
             <thead class="table-light">
                 <tr>
                     <th>Tháng</th>
@@ -315,22 +344,22 @@ require __DIR__ . '/../includes/admin-dau.php';
             <tbody>
             <?php foreach ($dsTheoThang as $dong): ?>
                 <?php
-                $phat     = (int) $dong['tong_phat'];
+                $phat      = (int) $dong['tong_phat'];
                 $boiThuong = (int) $dong['tong_boi_thuong'];
                 // 'YYYY-MM' -> 'MM/YYYY'
                 [$nam, $thang] = explode('-', $dong['thang']);
                 ?>
                 <tr>
-                    <td><?= e($thang . '/' . $nam) ?></td>
-                    <td class="text-end"><?= (int) $dong['so_cuon'] ?></td>
-                    <td class="text-end"><?= e(tienVND($phat)) ?></td>
-                    <td class="text-end"><?= e(tienVND($boiThuong)) ?></td>
-                    <td class="text-end fw-semibold"><?= e(tienVND($phat + $boiThuong)) ?></td>
-                    <td>
+                    <td class="the-dau">Tháng <?= e($thang . '/' . $nam) ?></td>
+                    <td class="text-end" data-nhan="Cuốn đã trả"><?= (int) $dong['so_cuon'] ?></td>
+                    <td class="text-end" data-nhan="Phạt trễ"><?= e(tienVND($phat)) ?></td>
+                    <td class="text-end" data-nhan="Bồi thường"><?= e(tienVND($boiThuong)) ?></td>
+                    <td class="text-end fw-semibold" data-nhan="Tổng"><?= e(tienVND($phat + $boiThuong)) ?></td>
+                    <td data-nhan="Biểu đồ">
                         <div class="progress" style="height:.9rem" role="img"
                              aria-label="Phạt <?= e(tienVND($phat)) ?>, bồi thường <?= e(tienVND($boiThuong)) ?>">
-                            <div class="progress-bar bg-warning" style="width:<?= phanTram($phat, $thangLonNhat) ?>%"></div>
-                            <div class="progress-bar bg-danger" style="width:<?= phanTram($boiThuong, $thangLonNhat) ?>%"></div>
+                            <div class="progress-bar thanh-dong" style="width:<?= phanTram($phat, $thangLonNhat) ?>%"></div>
+                            <div class="progress-bar thanh-do" style="width:<?= phanTram($boiThuong, $thangLonNhat) ?>%"></div>
                         </div>
                     </td>
                 </tr>
@@ -343,20 +372,20 @@ require __DIR__ . '/../includes/admin-dau.php';
             <tfoot class="table-light">
                 <tr>
                     <th>Cộng</th>
-                    <th class="text-end"><?= $tongCuonDaTra ?></th>
-                    <th class="text-end"><?= e(tienVND($tongPhat)) ?></th>
-                    <th class="text-end"><?= e(tienVND($tongBoiThuong)) ?></th>
-                    <th class="text-end"><?= e(tienVND($tongPhat + $tongBoiThuong)) ?></th>
-                    <th></th>
+                    <th class="text-end" data-nhan="Cuốn đã trả"><?= $tongCuonDaTra ?></th>
+                    <th class="text-end" data-nhan="Phạt trễ"><?= e(tienVND($tongPhat)) ?></th>
+                    <th class="text-end" data-nhan="Bồi thường"><?= e(tienVND($tongBoiThuong)) ?></th>
+                    <th class="text-end" data-nhan="Tổng"><?= e(tienVND($tongPhat + $tongBoiThuong)) ?></th>
+                    <th class="d-none d-md-table-cell"></th>
                 </tr>
             </tfoot>
             <?php endif; ?>
         </table>
     </div>
     <div class="card-footer bg-white small text-muted">
-        <span class="badge text-bg-warning">&nbsp;</span> Phạt trả trễ
+        <span class="chip-mau chip-dong"></span> Phạt trả trễ
         &nbsp;&nbsp;
-        <span class="badge text-bg-danger">&nbsp;</span> Bồi thường (hỏng / mất).
+        <span class="chip-mau chip-do"></span> Bồi thường (hỏng / mất).
         Chỉ tính các cuốn đã trả, gom theo tháng của ngày trả.
     </div>
 </div>

@@ -103,20 +103,29 @@ require __DIR__ . '/../includes/admin-dau.php';
 <div class="row g-4">
     <div class="col-lg-8">
         <div class="card">
-            <div class="card-body">
+            <div class="card-body p-4">
                 <h1 class="h4 mb-4">Lập phiếu mượn</h1>
 
                 <?php if ($loi['chung'] !== ''): ?>
-                    <div class="alert alert-danger" role="alert"><?= e($loi['chung']) ?></div>
+                    <div class="alert alert-danger alert-thong-bao" role="alert">
+                        <img class="ic" src="../assets/icons/den/x-circle.svg" alt="" width="20" height="20">
+                        <span><?= e($loi['chung']) ?></span>
+                    </div>
                 <?php elseif ($coLoi): ?>
-                    <div class="alert alert-danger" role="alert">Chưa lập được phiếu. Hãy sửa các ô đang viền đỏ.</div>
+                    <div class="alert alert-danger alert-thong-bao" role="alert">
+                        <img class="ic" src="../assets/icons/den/x-circle.svg" alt="" width="20" height="20">
+                        <span>Chưa lập được phiếu. Hãy sửa các ô đang viền đỏ.</span>
+                    </div>
                 <?php endif; ?>
 
                 <!-- Không đặt action: form gửi về chính trang này -->
                 <form method="post" novalidate autocomplete="off">
                     <input type="hidden" name="csrf" value="<?= e(taoTokenCsrf()) ?>">
 
-                    <div class="mb-4">
+                    <!-- Khối 1: độc giả -->
+                    <section class="form-block">
+                        <h2 class="form-section">Độc giả</h2>
+                        <p class="form-section-sub">Nhập mã độc giả như quẹt thẻ thư viện.</p>
                         <label for="ma_doc_gia" class="form-label">Mã độc giả <span class="text-danger">*</span></label>
                         <input type="text" class="form-control<?= lopLoi($loiO, 'ma_doc_gia') ?>" id="ma_doc_gia"
                                name="ma_doc_gia" value="<?= e($maDocGia) ?>" maxlength="20" list="goi-y-doc-gia" autofocus>
@@ -127,34 +136,38 @@ require __DIR__ . '/../includes/admin-dau.php';
                             <?php endforeach; ?>
                         </datalist>
                         <div class="form-text">Gõ vài ký tự đầu của mã để chọn từ danh sách gợi ý.</div>
-                    </div>
+                    </section>
 
-                    <p class="form-label mb-2">Sách muốn mượn <span class="text-danger">*</span></p>
-                    <div class="row g-3">
-                        <?php for ($i = 0; $i < $soOSach; $i++): ?>
-                            <div class="col-md-6">
-                                <input type="text" class="form-control<?= isset($loi['sach'][$i]) ? ' is-invalid' : '' ?>"
-                                       name="ma_sach[<?= $i ?>]" value="<?= e($dsMa[$i]) ?>" maxlength="20"
-                                       list="goi-y-sach" placeholder="Mã sách thứ <?= $i + 1 ?>"
-                                       aria-label="Mã sách thứ <?= $i + 1 ?>">
-                                <?php if (isset($loi['sach'][$i])): ?>
-                                    <div class="invalid-feedback"><?= e($loi['sach'][$i]) ?></div>
-                                <?php endif; ?>
-                            </div>
-                        <?php endfor; ?>
-                    </div>
-                    <datalist id="goi-y-sach">
-                        <?php foreach ($dsGoiYSach as $sach): ?>
-                            <option value="<?= e($sach['ma_sach']) ?>"><?= e($sach['ten_sach']) ?> (còn <?= (int) $sach['so_con_lai'] ?>)</option>
-                        <?php endforeach; ?>
-                    </datalist>
-                    <div class="form-text mt-2">
-                        Chỉ gợi ý các sách còn bản trên kệ. Ô nào không dùng thì để trống.
-                        Ngày mượn là hôm nay, hạn trả tự tính theo loại độc giả.
-                    </div>
+                    <!-- Khối 2: sách muốn mượn -->
+                    <section class="form-block">
+                        <h2 class="form-section" id="nhan-sach">Sách muốn mượn <span class="text-danger">*</span></h2>
+                        <p class="form-section-sub">Nhập mã từng cuốn như quét mã vạch. Ô nào không dùng thì để trống.</p>
+                        <div class="row g-3" role="group" aria-labelledby="nhan-sach">
+                            <?php for ($i = 0; $i < $soOSach; $i++): ?>
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control<?= isset($loi['sach'][$i]) ? ' is-invalid' : '' ?>"
+                                           name="ma_sach[<?= $i ?>]" value="<?= e($dsMa[$i]) ?>" maxlength="20"
+                                           list="goi-y-sach" placeholder="Mã sách thứ <?= $i + 1 ?>"
+                                           aria-label="Mã sách thứ <?= $i + 1 ?>">
+                                    <?php if (isset($loi['sach'][$i])): ?>
+                                        <div class="invalid-feedback"><?= e($loi['sach'][$i]) ?></div>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endfor; ?>
+                        </div>
+                        <datalist id="goi-y-sach">
+                            <?php foreach ($dsGoiYSach as $sach): ?>
+                                <option value="<?= e($sach['ma_sach']) ?>"><?= e($sach['ten_sach']) ?> (còn <?= (int) $sach['so_con_lai'] ?>)</option>
+                            <?php endforeach; ?>
+                        </datalist>
+                        <div class="form-text mt-2">
+                            Chỉ gợi ý các sách còn bản trên kệ.
+                            Ngày mượn là hôm nay, hạn trả tự tính theo loại độc giả.
+                        </div>
+                    </section>
 
                     <div class="mt-4 d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">Lập phiếu</button>
+                        <button type="submit" class="btn btn-primary"><img class="ic" src="../assets/icons/trang/check-circle.svg" alt="" width="16" height="16">Lập phiếu</button>
                         <a href="phieumuon.php" class="btn btn-outline-secondary">Hủy</a>
                     </div>
                 </form>
@@ -164,23 +177,25 @@ require __DIR__ . '/../includes/admin-dau.php';
 
     <div class="col-lg-4">
         <div class="card">
-            <div class="card-body">
-                <h2 class="h6 mb-3">Quy định mượn</h2>
-                <table class="table table-sm mb-2">
-                    <thead>
-                        <tr><th>Loại</th><th class="text-center">Tối đa</th><th class="text-center">Hạn</th><th class="text-center">Gia hạn</th></tr>
-                    </thead>
-                    <tbody>
-                    <?php foreach ($dsLoai as $loai): ?>
-                        <tr>
-                            <td><?= e($loai['ten_loai']) ?></td>
-                            <td class="text-center"><?= (int) $loai['so_sach_toi_da'] ?> cuốn</td>
-                            <td class="text-center"><?= (int) $loai['so_ngay_muon'] ?> ngày</td>
-                            <td class="text-center"><?= (int) $loai['so_lan_gia_han'] ?> lần</td>
-                        </tr>
-                    <?php endforeach; ?>
-                    </tbody>
-                </table>
+            <div class="card-body p-4">
+                <h2 class="form-section mb-3">Quy định mượn</h2>
+                <div class="table-responsive">
+                    <table class="table table-sm mb-2">
+                        <thead>
+                            <tr><th>Loại</th><th class="text-center">Tối đa</th><th class="text-center">Hạn</th><th class="text-center">Gia hạn</th></tr>
+                        </thead>
+                        <tbody>
+                        <?php foreach ($dsLoai as $loai): ?>
+                            <tr>
+                                <td><?= e($loai['ten_loai']) ?></td>
+                                <td class="text-center"><?= (int) $loai['so_sach_toi_da'] ?> cuốn</td>
+                                <td class="text-center"><?= (int) $loai['so_ngay_muon'] ?> ngày</td>
+                                <td class="text-center"><?= (int) $loai['so_lan_gia_han'] ?> lần</td>
+                            </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
                 <ul class="small text-muted ps-3 mb-0">
                     <li>Phạt trễ hạn: <?= e(tienVND($tienPhatMoiNgay)) ?> / cuốn / ngày.</li>
                     <li>Không lập phiếu cho độc giả bị khóa hoặc đang giữ sách quá hạn.</li>

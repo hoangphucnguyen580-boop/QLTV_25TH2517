@@ -235,7 +235,7 @@ textarea.form-control { min-height: 0; }
 .input-group-text { background: #EFEADD; border-color: var(--vien-o); }
 
 /* ---------- 7. Nhãn trạng thái (badge) và thông báo (alert) ---------- */
-.badge { --bs-badge-border-radius: 999px; --bs-badge-padding-x: .7em; --bs-badge-padding-y: .4em; font-weight: 600; font-size: .8125rem; }
+.badge { font-family: var(--font-noi-dung); --bs-badge-border-radius: 999px; --bs-badge-padding-x: .7em; --bs-badge-padding-y: .4em; font-weight: 600; font-size: .8125rem; }
 /* Bootstrap ép màu nhãn bằng !important nên chỗ này buộc phải !important theo */
 .text-bg-primary   { background-color: #E6EEF2 !important; color: #1F4A5E !important; }
 .text-bg-success   { background-color: #DDEEE7 !important; color: #14463A !important; }
@@ -309,6 +309,7 @@ textarea.form-control { min-height: 0; }
 .stat-card { background: #fff; border: 1px solid var(--vien); border-radius: 10px; padding: 20px 22px; height: 100%; }
 .stat-label { display: flex; align-items: center; gap: 8px; font-size: .8125rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--phu); }
 .stat-num { font-family: var(--font-tieu-de); font-weight: 600; font-size: 3rem; line-height: 1.1; margin-top: 8px; font-variant-numeric: tabular-nums; }
+.stat-num.stat-tien { font-size: 2.1rem; }
 .stat-card.canh-bao { background: #FBE4E1; border-color: #E7B9B4; }
 .stat-card.canh-bao .stat-label, .stat-card.canh-bao .stat-num { color: #8C1D18; }
 .btn .ic { margin-right: 6px; }
@@ -336,3 +337,71 @@ textarea.form-control { min-height: 0; }
 .bia-nho { width: 40px; height: 56px; }
 .bia-lon { width: 96px; height: 134px; flex-direction: column; gap: 6px; font-size: .8125rem; line-height: 1.2; padding: 6px; }
 .form-check-input { --bs-form-check-bg: #fff; }   /* ô tick/radio nền trắng; khi được chọn vẫn tô xanh rêu */
+
+/* ---------- 12. Đợt 3: bảng thành danh sách thẻ trên điện thoại, thanh biểu đồ, chip màu ----------
+   Cách dùng cho một bảng (không đụng tới dữ liệu hay PHP):
+     - Thêm class "bang-the" vào <table>.
+     - Mỗi ô dữ liệu thêm data-nhan="Tên cột": trên điện thoại ô hiện thành dòng "TÊN CỘT .... giá trị".
+     - Ô làm tiêu đề thẻ thêm class "the-dau" (không cần data-nhan); ô nhãn trạng thái thêm "the-trang-thai".
+     - Ô chứa nút thao tác thêm class "cot-thao-tac" (nút giãn full chiều ngang thẻ).
+     - Ô có từ 2 phần tử con trở lên (vd tên + dòng phụ) phải bọc phần tử con vào 1 <div> hoặc <span>.
+   Trên máy tính (từ 768px) bảng giữ nguyên như cũ. */
+.card-header .ic { margin-right: 8px; }
+
+/* Thanh biểu đồ dùng màu của bảng màu thay cho vàng/đỏ mặc định của Bootstrap */
+.progress-bar.thanh-dong { background-color: #8A5A12; }
+.progress-bar.thanh-do   { background-color: #B3261E; }
+/* Ô màu nhỏ làm chú thích cho thanh biểu đồ */
+.chip-mau { display: inline-block; width: .9rem; height: .9rem; border-radius: 3px; vertical-align: -2px; margin-right: 6px; }
+.chip-dong { background: #8A5A12; }
+.chip-do   { background: #B3261E; }
+
+@media (max-width: 767.98px) {
+    .bang-the thead { display: none; }
+    .bang-the tbody, .bang-the tfoot { display: block; }
+    .bang-the tr {
+        display: flex; flex-wrap: wrap; align-items: center; gap: 2px 12px;
+        padding: 14px 16px; border-bottom: 1px solid #EEE8DA;
+    }
+    .bang-the tbody tr:last-child { border-bottom: 0; }
+    .bang-the tfoot tr { background: #EFEADD; border-bottom: 0; }
+
+    /* Mọi ô thành khối đầy chiều ngang; thứ tự mặc định 3, ô tiêu đề lên đầu, nút xuống cuối */
+    .table.bang-the > :not(caption) > * > * {
+        display: block; width: 100%; order: 3; padding: 3px 0;
+        border-bottom-width: 0; box-shadow: none; background: transparent;
+    }
+    /* Ô có data-nhan: nhãn bên trái, giá trị bên phải */
+    .table.bang-the > :not(caption) > * > [data-nhan] {
+        display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
+        text-align: right !important;
+    }
+    .bang-the [data-nhan]::before {
+        content: attr(data-nhan); flex: none; text-align: left;
+        font-size: .8125rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--phu);
+    }
+    .table.bang-the > :not(caption) > * > .the-dau {
+        order: 1; flex: 1 1 0; width: auto; min-width: 0; text-align: left !important;
+        font-family: var(--font-tieu-de); font-size: 1.15rem; font-weight: 600; line-height: 1.3;
+    }
+    /* Dòng phụ (mã, tác giả...) dưới tên trong ô tiêu đề thẻ: trở về font nội dung, cỡ nhỏ, màu phụ */
+    .bang-the .the-dau .small { font-family: var(--font-noi-dung); font-size: .875rem; font-weight: 400; line-height: 1.4; color: var(--phu); }
+    .table.bang-the > :not(caption) > * > .the-trang-thai { order: 2; flex: 0 0 auto; width: auto; text-align: right !important; }
+    .table.bang-the > :not(caption) > * > .cot-thao-tac { order: 9; margin-top: 8px; }
+    .bang-the .cot-thao-tac .btn { display: block; width: 100%; }
+
+    /* Dòng tổng ở chân bảng: ô tiêu đề bên trái, ô trống ẩn đi */
+    .bang-the tfoot th:not([data-nhan]) { text-align: left !important; font-family: var(--font-tieu-de); font-size: 1rem; }
+    .bang-the th:empty { display: none !important; }
+
+    /* Form trả sách trong thẻ: ô chọn tình trạng giãn ra, nút Trả giữ cỡ vừa */
+    .bang-the .cot-thao-tac form { display: flex; gap: 8px; }
+    .bang-the .cot-thao-tac form .form-select { flex: 1 1 auto; width: auto !important; }
+    .bang-the .cot-thao-tac form .btn { flex: none; width: auto; }
+
+    /* Thanh biểu đồ trong thẻ: chiếm phần còn lại của dòng */
+    .bang-the [data-nhan] .progress { flex: 1 1 auto; min-width: 8rem; }
+}
+
+/* Nút Lọc / Bỏ lọc cao bằng ô nhập (44px) để thẳng hàng cả đáy lẫn đỉnh */
+.loc-nut .btn { min-height: 44px; display: inline-flex; align-items: center; }
